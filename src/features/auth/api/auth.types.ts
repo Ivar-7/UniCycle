@@ -1,11 +1,10 @@
 export interface StudentSignInCredentials {
-  readonly universityEmail: string;
+  readonly email: string;
   readonly password: string;
 }
 
 export interface StudentRegisterCredentials extends StudentSignInCredentials {
   readonly fullName: string;
-  readonly residenceHall: string;
 }
 
 export interface AuthSessionSummary {

@@ -1,7 +1,7 @@
 # Profile Feature
 
 ## Purpose
-Displays a student's verified university profile, accommodation hall, seller reputation, and sustainability impact metrics (kilograms of household waste diverted from landfill).
+Displays a user's profile, default campus pickup point, seller reputation, and sustainability impact metrics (kilograms of household waste diverted from landfill).
 
 ## Structure
 - `api/` — Types, Zod schemas, query keys, and profile API methods (`profile.api.ts`, `profile.keys.ts`, `profile.schema.ts`, `profile.types.ts`).

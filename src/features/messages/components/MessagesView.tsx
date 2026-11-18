@@ -7,7 +7,7 @@ import { cn } from '@/shared/utils/cn';
 import { useMessages } from '../state/useMessages';
 
 const QUICK_REPLIES = [
-  'Can I pick this up at North Hall today at 5pm?',
+  'Can I pick this up at the Student Center today at 5pm?',
   'Is the item still available?',
   'Would you take an afternoon collection?',
 ] as const;
@@ -50,7 +50,7 @@ export function MessagesView() {
           Student Messages & Handovers
         </h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Coordinate safe hall-to-hall pickups directly with verified student buyers and sellers.
+          Coordinate safe campus pickups directly with buyers and sellers.
         </p>
       </div>
 
@@ -71,8 +71,8 @@ export function MessagesView() {
         <EmptyState
           icon={<LogIn className="h-6 w-6" />}
           title="Sign in to view your inbox"
-          description="Sign in with your university email to message student sellers and arrange residence hall pickups."
-          actionLabel="Student Sign In"
+          description="Sign in with your email to message sellers and arrange campus pickups."
+          actionLabel="Sign In"
           onAction={() => void navigate('/auth?redirect=/messages')}
         />
       ) : null}
@@ -112,7 +112,7 @@ export function MessagesView() {
                   className={cn(
                     'flex w-full flex-col gap-2 rounded-2xl border p-4 text-left transition-all',
                     isSelected
-                      ? 'border-zinc-400 bg-white shadow-xs dark:border-zinc-500 dark:bg-zinc-900'
+                      ? 'border-sky-700 bg-white shadow-xs dark:border-sky-500 dark:bg-zinc-900'
                       : 'border-zinc-200 bg-white/60 hover:bg-white dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:bg-zinc-900',
                   )}
                 >
@@ -121,7 +121,7 @@ export function MessagesView() {
                       {thread.peerStudentName}
                     </span>
                     {thread.unreadCount > 0 ? (
-                      <Badge tone="neutral">{thread.unreadCount} new</Badge>
+                      <Badge tone="sky">{thread.unreadCount} new</Badge>
                     ) : null}
                   </div>
                   <span className="truncate text-xs font-medium text-zinc-500 dark:text-zinc-400">
@@ -162,7 +162,7 @@ export function MessagesView() {
                   </p>
                 </div>
               </div>
-              <Badge tone="neutral">Verified Student</Badge>
+              <Badge tone="sky">Verified Student</Badge>
             </div>
 
             <div className="flex min-h-64 max-h-96 flex-col gap-3 overflow-y-auto py-2">
@@ -172,7 +172,7 @@ export function MessagesView() {
                   className={cn(
                     'flex max-w-md flex-col gap-1 rounded-2xl px-4 py-2.5 text-sm',
                     msg.sender === 'me'
-                      ? 'self-end border border-zinc-300 bg-zinc-200/80 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-700 dark:text-zinc-100'
+                      ? 'self-end bg-sky-700 text-white dark:bg-sky-700 dark:text-sky-50'
                       : 'self-start bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100',
                   )}
                 >
@@ -213,7 +213,7 @@ export function MessagesView() {
                 />
                 <button
                   type="submit"
-                  className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-zinc-300 bg-zinc-200/80 px-4 py-2.5 text-xs font-semibold text-zinc-900 transition-colors hover:bg-zinc-300/80 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-sky-700 px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-sky-800 dark:bg-sky-700 dark:text-sky-50 dark:hover:bg-sky-600"
                 >
                   <Send className="h-3.5 w-3.5" />
                   <span>Send</span>

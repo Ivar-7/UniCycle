@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { signOutStudentFromFirebase } from '@/features/auth/api/auth.api';
 import { getUserErrorMessage, logDiagnosticError } from '@/shared/errors';
 import { useAsyncState } from '@/shared/hooks/useAsyncState';
 import { useAuth } from '@/shared/hooks/useAuth';
@@ -10,6 +11,7 @@ export function useProfile() {
   const { state, setLoading, setEmpty, setSuccess, setError } =
     useAsyncState<StudentProfile | null>(null, 'loading');
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [isSigningOut, setIsSigningOut] = useState<boolean>(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
 
@@ -57,6 +59,19 @@ export function useProfile() {
     [setSuccess, state.data, user],
   );
 
+  const signOut = useCallback(async () => {
+    setIsSigningOut(true);
+    setSaveError(null);
+    try {
+      await signOutStudentFromFirebase();
+    } catch (err: unknown) {
+      logDiagnosticError(err, 'useProfile.signOut');
+      setSaveError(getUserErrorMessage(err));
+    } finally {
+      setIsSigningOut(false);
+    }
+  }, []);
+
   return {
     user,
     authLoading,
@@ -64,9 +79,11 @@ export function useProfile() {
     profile: state.data,
     error: state.error,
     isSaving,
+    isSigningOut,
     saveError,
     saveSuccess,
     saveProfile,
+    signOut,
     reload: loadProfile,
   };
 }

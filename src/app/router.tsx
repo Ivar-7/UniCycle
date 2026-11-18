@@ -27,7 +27,7 @@ function RouteErrorFallback() {
         <button
           type="button"
           onClick={() => window.location.reload()}
-          className="inline-flex items-center gap-2 rounded-xl border border-zinc-300 bg-zinc-200/80 px-4 py-2 text-xs font-semibold text-zinc-900 hover:bg-zinc-300/80 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+          className="inline-flex items-center gap-2 rounded-xl bg-sky-700 px-4 py-2 text-xs font-semibold text-white hover:bg-sky-800 dark:bg-sky-700 dark:text-sky-50 dark:hover:bg-sky-600"
         >
           <RotateCcw className="h-3.5 w-3.5" />
           Reload Page

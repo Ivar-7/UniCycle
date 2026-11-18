@@ -60,7 +60,7 @@ export function FilterSidebar({
                 className={cn(
                   'flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border transition-colors',
                   checked
-                    ? 'border-zinc-500 bg-zinc-600 text-white dark:border-zinc-400 dark:bg-zinc-400 dark:text-zinc-950'
+                    ? 'border-sky-700 bg-sky-700 text-white dark:border-sky-600 dark:bg-sky-700 dark:text-sky-50'
                     : 'border-zinc-400 bg-transparent group-hover:border-zinc-600 dark:border-zinc-600 dark:group-hover:border-zinc-400',
                 )}
               >
@@ -85,11 +85,11 @@ export function FilterSidebar({
             type="range"
             min={PRICE_MIN}
             max={PRICE_MAX}
-            step={10}
+            step={500}
             value={filters.maxPrice}
             aria-label="Maximum price"
             onChange={(e) => onPriceChange(filters.minPrice, Number(e.target.value))}
-            className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-zinc-200 accent-zinc-600 dark:bg-zinc-800 dark:accent-zinc-400"
+            className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-zinc-200 accent-sky-700 dark:bg-zinc-800 dark:accent-sky-500"
           />
         </div>
         <div className="flex items-center justify-between text-sm tabular-nums text-zinc-800 dark:text-zinc-200">
@@ -121,7 +121,7 @@ export function FilterSidebar({
                   'h-7 w-7 rounded-full border border-zinc-300 transition-transform hover:scale-105 dark:border-zinc-600',
                   colour.bgClass,
                   selected &&
-                    'ring-2 ring-zinc-500 ring-offset-2 ring-offset-white dark:ring-zinc-400 dark:ring-offset-zinc-950',
+                    'ring-2 ring-sky-700 ring-offset-2 ring-offset-white dark:ring-sky-400 dark:ring-offset-zinc-950',
                 )}
               />
             );
@@ -140,14 +140,14 @@ export function FilterSidebar({
           onClick={() => onToggleInStock(!filters.inStock)}
           className={cn(
             'relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border border-transparent transition-colors',
-            filters.inStock ? 'bg-zinc-600 dark:bg-zinc-500' : 'bg-zinc-300 dark:bg-zinc-800',
+            filters.inStock ? 'bg-sky-700 dark:bg-sky-600' : 'bg-zinc-300 dark:bg-zinc-800',
           )}
         >
           <span
             className={cn(
               'inline-block h-3.5 w-3.5 rounded-full transition-transform',
               filters.inStock
-                ? 'translate-x-4 bg-white dark:bg-zinc-100'
+                ? 'translate-x-4 bg-white dark:bg-sky-50'
                 : 'translate-x-0.5 bg-white dark:bg-zinc-400',
             )}
           />
@@ -174,12 +174,12 @@ export function FilterSidebar({
                 className={cn(
                   'flex h-4 w-4 items-center justify-center rounded-full border transition-colors',
                   isSelected
-                    ? 'border-zinc-500 bg-zinc-600 dark:border-zinc-400 dark:bg-zinc-400'
+                    ? 'border-sky-700 bg-sky-700 dark:border-sky-600 dark:bg-sky-600'
                     : 'border-zinc-400 bg-transparent dark:border-zinc-600',
                 )}
               >
                 {isSelected ? (
-                  <span className="h-1.5 w-1.5 rounded-full bg-white dark:bg-zinc-950" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-white dark:bg-sky-50" />
                 ) : null}
               </button>
               <span className="inline-flex items-center gap-2 font-normal">

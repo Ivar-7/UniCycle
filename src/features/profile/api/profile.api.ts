@@ -14,14 +14,15 @@ export async function fetchStudentProfile(user: User): Promise<StudentProfile> {
     return existing;
   }
 
-  const email = user.email ?? 'student@university.edu';
+  const email = user.email ?? 'member@unicycle.app';
+  const hasCampusDomain = isCampusEmail(email);
   const initialProfile: StudentProfile = {
     id: user.uid,
-    fullName: resolveDisplayName({ displayName: user.displayName, email }, 'Campus Student'),
+    fullName: resolveDisplayName({ displayName: user.displayName, email }, 'Campus Member'),
     universityEmail: email,
-    universityName: 'Verified Campus Member',
-    residenceHall: 'North Hall Residence, Block B',
-    isVerifiedStudent: isCampusEmail(email),
+    universityName: hasCampusDomain ? 'Verified Campus Member' : 'Campus Community Member',
+    residenceHall: 'Student Center · Main Entrance',
+    isVerifiedStudent: hasCampusDomain,
     itemsReusedCount: 0,
     wasteDivertedKg: 0,
     rating: 5.0,

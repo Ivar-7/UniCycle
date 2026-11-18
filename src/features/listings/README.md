@@ -1,7 +1,7 @@
 # Listings Feature
 
 ## Purpose
-Allows university students to list pre-owned household items for sale, track views, update listing availability, and coordinate campus hall collection points.
+Allows university students to list pre-owned household items for sale, track views, update listing availability, and coordinate campus collection points.
 
 ## Structure
 - `api/` — Types, Zod validation schemas, query keys, and listing API methods (`listings.api.ts`, `listings.keys.ts`, `listings.schema.ts`, `listings.types.ts`).

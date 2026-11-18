@@ -109,7 +109,7 @@ export function ItemDetailView({ itemId }: ItemDetailViewProps) {
 
         <Link
           to="/wishlist"
-          className="text-xs font-medium text-zinc-700 hover:text-zinc-900 hover:underline dark:text-zinc-300 dark:hover:text-zinc-100"
+          className="text-xs font-medium text-sky-700 hover:underline dark:text-sky-400"
         >
           View Saved Bag
         </Link>
@@ -157,7 +157,7 @@ export function ItemDetailView({ itemId }: ItemDetailViewProps) {
             )}
 
             <div className="absolute top-3 left-3 flex items-center gap-2">
-              <Badge tone={product.inStock ? 'neutral' : 'slate'}>
+              <Badge tone={product.inStock ? 'sky' : 'slate'}>
                 {product.inStock ? product.condition : 'Sold out'}
               </Badge>
             </div>
@@ -201,7 +201,7 @@ export function ItemDetailView({ itemId }: ItemDetailViewProps) {
                 <span
                   className={cn(
                     'h-2 w-2 rounded-full',
-                    product.inStock ? 'bg-zinc-500 dark:bg-zinc-400' : 'bg-zinc-400',
+                    product.inStock ? 'bg-sky-600 dark:bg-sky-400' : 'bg-zinc-400',
                   )}
                 />
                 {product.inStock ? 'Available for campus pickup' : 'Currently unavailable'}
@@ -240,7 +240,7 @@ export function ItemDetailView({ itemId }: ItemDetailViewProps) {
                 Seller
               </dt>
               <dd className="inline-flex items-center gap-1.5 font-semibold text-zinc-900 dark:text-zinc-100">
-                <UserCheck className="h-3.5 w-3.5 text-zinc-700 dark:text-zinc-300" />
+                <UserCheck className="h-3.5 w-3.5 text-sky-700 dark:text-sky-400" />
                 <span>{product.sellerName}</span>
               </dd>
             </div>
@@ -257,7 +257,7 @@ export function ItemDetailView({ itemId }: ItemDetailViewProps) {
 
           <div className="rounded-xl border border-zinc-200 bg-zinc-50/80 p-3.5 text-xs dark:border-zinc-800 dark:bg-zinc-950/60">
             <div className="flex items-start gap-2.5">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-zinc-700 dark:text-zinc-300" />
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-sky-700 dark:text-sky-400" />
               <div className="space-y-0.5">
                 <p className="font-semibold text-zinc-900 dark:text-zinc-100">
                   Pickup at {product.campusHall}
@@ -274,7 +274,7 @@ export function ItemDetailView({ itemId }: ItemDetailViewProps) {
               type="button"
               disabled={!product.inStock || isReserving}
               onClick={() => void handleBuyNow()}
-              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-zinc-200/80 px-5 text-xs font-semibold tracking-wider text-zinc-900 uppercase transition-colors hover:bg-zinc-300/80 disabled:cursor-not-allowed disabled:opacity-45 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-sky-700 px-5 text-xs font-semibold tracking-wider text-white uppercase transition-colors hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-45 dark:bg-sky-700 dark:text-sky-50 dark:hover:bg-sky-600"
             >
               {isReserving ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -343,7 +343,7 @@ export function ItemDetailView({ itemId }: ItemDetailViewProps) {
 
           <div className="flex items-center gap-2 border-t border-zinc-100 pt-4 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
             <ShieldCheck className="h-4 w-4 shrink-0 text-zinc-700 dark:text-zinc-300" />
-            <span>Verified .edu / .ac.uk campus handover protection</span>
+            <span>Safe campus handover protection</span>
           </div>
         </Card>
       </div>

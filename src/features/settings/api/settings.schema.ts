@@ -7,5 +7,5 @@ export const studentSettingsSchema = z.object({
   pickupReminders: z.boolean(),
   showVerifiedBadgePublicly: z.boolean(),
   ecoImpactPublic: z.boolean(),
-  preferredCurrency: z.enum(['USD', 'GBP', 'EUR']),
+  preferredCurrency: z.enum(['KES', 'GBP', 'EUR']),
 });

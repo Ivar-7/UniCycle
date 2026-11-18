@@ -1,7 +1,8 @@
 import type { User } from 'firebase/auth';
 
 export function isCampusEmail(email: string): boolean {
-  return email.endsWith('.ac.uk') || email.endsWith('.edu');
+  const normalized = email.trim().toLowerCase();
+  return normalized.endsWith('.ac.uk') || normalized.endsWith('.edu');
 }
 
 export function resolveDisplayName(

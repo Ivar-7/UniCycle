@@ -59,13 +59,13 @@ export function MarketplaceOverview() {
         className="flex flex-col justify-between gap-5 rounded-2xl border border-zinc-200 bg-stone-50/90 px-5 py-5 sm:px-7 lg:flex-row lg:items-center dark:border-zinc-800 dark:bg-zinc-900/60"
       >
         <div className="space-y-1.5">
-          <div className="inline-flex items-center gap-2 text-xs font-medium text-zinc-800 dark:text-zinc-200">
+          <div className="inline-flex items-center gap-2 text-xs font-medium text-sky-700 dark:text-sky-400">
             <UniCycleLogo className="h-4 w-4" />
             <span>Verified Campus Marketplace</span>
           </div>
           <p className="text-sm text-zinc-700 dark:text-zinc-300">
-            Buy and sell pre-owned furniture, electronics, kitchenware, and carry directly in your
-            residence halls.
+            Buy and sell pre-owned furniture, electronics, kitchenware, and carry directly on
+            campus.
           </p>
         </div>
 
@@ -80,20 +80,20 @@ export function MarketplaceOverview() {
             <p className="text-base font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
               {formatPrice(0)} Fee
             </p>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">Hall Handover</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">Campus Handover</p>
           </div>
           <div>
             <p className="inline-flex items-center gap-1 text-base font-bold text-zinc-900 dark:text-zinc-100">
               100%
-              <ShieldCheck className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
+              <ShieldCheck className="h-4 w-4 text-sky-700 dark:text-sky-400" />
             </p>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">.edu / .ac.uk</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">Safe Pickups</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 sm:ml-2">
             <Link
               to="/listings"
-              className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-300 bg-zinc-200/80 px-4 py-2 text-xs font-semibold text-zinc-900 transition-colors hover:bg-zinc-300/80 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-sky-700 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-sky-800 dark:bg-sky-700 dark:text-sky-50 dark:hover:bg-sky-600"
             >
               Sell an Item
             </Link>
@@ -108,11 +108,11 @@ export function MarketplaceOverview() {
             Shop
           </span>
           <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-100">
-            Everyday carry & hall essentials
+            Everyday carry &amp; campus essentials
           </h2>
           <p className="text-sm leading-relaxed text-zinc-600 sm:text-base dark:text-zinc-400">
-            Furniture, kitchenware, bags, and small tech from verified campus sellers. Free
-            residence hall pickup on every item.
+            Furniture, kitchenware, bags, and small tech from campus sellers. Free on-campus pickup
+            on every item.
           </p>
         </div>
 

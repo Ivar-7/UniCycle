@@ -6,15 +6,13 @@ import {
   registerStudentWithFirebase,
   sendStudentPasswordReset,
   signInStudentWithFirebase,
-  signOutStudentFromFirebase,
 } from '../api/auth.api';
 
 export function useStudentAuth() {
   const { user, isLoading: authLoading } = useAuth();
-  const [universityEmail, setUniversityEmail] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [fullName, setFullName] = useState<string>('');
-  const [residenceHall, setResidenceHall] = useState<string>('North Hall Residence, Block B');
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -27,7 +25,7 @@ export function useStudentAuth() {
     setFormError(null);
     setResetMessage(null);
     try {
-      await signInStudentWithFirebase({ universityEmail, password });
+      await signInStudentWithFirebase({ email, password });
       setPassword('');
       setIsSubmitting(false);
       return true;
@@ -36,7 +34,7 @@ export function useStudentAuth() {
       setIsSubmitting(false);
       return false;
     }
-  }, [password, universityEmail]);
+  }, [email, password]);
 
   const submitRegister = useCallback(async (): Promise<boolean> => {
     setIsSubmitting(true);
@@ -44,10 +42,9 @@ export function useStudentAuth() {
     setResetMessage(null);
     try {
       await registerStudentWithFirebase({
-        universityEmail,
+        email,
         password,
         fullName,
-        residenceHall,
       });
       setPassword('');
       setIsSubmitting(false);
@@ -57,33 +54,21 @@ export function useStudentAuth() {
       setIsSubmitting(false);
       return false;
     }
-  }, [fullName, password, residenceHall, universityEmail]);
+  }, [email, fullName, password]);
 
   const submitPasswordReset = useCallback(async () => {
     setIsSubmitting(true);
     setFormError(null);
     setResetMessage(null);
     try {
-      await sendStudentPasswordReset(universityEmail);
-      setResetMessage('Password reset instructions sent to your university inbox.');
+      await sendStudentPasswordReset(email);
+      setResetMessage('Password reset instructions sent to your email inbox.');
     } catch (err: unknown) {
       setFormError(getUserErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }
-  }, [universityEmail]);
-
-  const signOutStudent = useCallback(async () => {
-    setIsSubmitting(true);
-    setFormError(null);
-    try {
-      await signOutStudentFromFirebase();
-    } catch (err: unknown) {
-      setFormError(getUserErrorMessage(err));
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, []);
+  }, [email]);
 
   return {
     authLoading,
@@ -92,17 +77,14 @@ export function useStudentAuth() {
     formError,
     setFormError,
     resetMessage,
-    universityEmail,
-    setUniversityEmail,
+    email,
+    setEmail,
     password,
     setPassword,
     fullName,
     setFullName,
-    residenceHall,
-    setResidenceHall,
     submitSignIn,
     submitRegister,
     submitPasswordReset,
-    signOutStudent,
   };
 }

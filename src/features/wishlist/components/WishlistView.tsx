@@ -34,12 +34,12 @@ export function WishlistView() {
             Saved Campus Essentials
           </h1>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Items saved for residence hall pickup or side-by-side comparison.
+            Items saved for campus pickup or side-by-side comparison.
           </p>
         </div>
         <Link
           to="/"
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-zinc-200/80 px-4 py-2.5 text-xs font-semibold text-zinc-900 transition-colors hover:bg-zinc-300/80 sm:w-auto dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-700 px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-sky-800 sm:w-auto dark:bg-sky-700 dark:text-sky-50 dark:hover:bg-sky-600"
         >
           <span>Browse Shop</span>
           <ArrowRight className="h-4 w-4" />
@@ -100,7 +100,7 @@ export function WishlistView() {
                     >
                       {entry.title}
                     </Link>
-                    <Badge tone={entry.inStock ? 'neutral' : 'slate'}>
+                    <Badge tone={entry.inStock ? 'sky' : 'slate'}>
                       {entry.inStock ? 'Available' : 'Sold'}
                     </Badge>
                   </div>
@@ -139,8 +139,8 @@ export function WishlistView() {
                   <span className="tabular-nums">{formatPrice(totalAmount)}</span>
                 </div>
                 <div className="flex justify-between text-zinc-600 dark:text-zinc-400">
-                  <span>Campus Hall Handover</span>
-                  <span className="font-medium text-zinc-900 dark:text-zinc-100">Free</span>
+                  <span>Campus Handover</span>
+                  <span className="font-medium text-sky-700 dark:text-sky-400">Free</span>
                 </div>
               </div>
               <div className="flex justify-between text-base font-bold text-zinc-900 dark:text-zinc-100">
@@ -149,7 +149,7 @@ export function WishlistView() {
               </div>
               {!user ? (
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  Sign in with your university email at checkout to generate hall pickup codes.
+                  Sign in with your email at checkout to generate pickup codes.
                 </p>
               ) : null}
             </div>
@@ -165,7 +165,7 @@ export function WishlistView() {
                   void navigate('/auth?redirect=/wishlist');
                 }
               }}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-zinc-200/80 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-900 transition-colors hover:bg-zinc-300/80 disabled:opacity-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-700 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-sky-800 disabled:opacity-50 dark:bg-sky-700 dark:text-sky-50 dark:hover:bg-sky-600"
             >
               {isCheckingOut ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

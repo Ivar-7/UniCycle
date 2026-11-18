@@ -1,11 +1,10 @@
 import type { AppError, ErrorCode, ErrorSeverity } from './error.types';
 
 const USER_MESSAGES: Record<ErrorCode, string> = {
-  AUTH_UNAUTHORIZED: 'Please sign in with your verified university account to continue.',
+  AUTH_UNAUTHORIZED: 'Please sign in with your account to continue.',
   AUTH_INVALID_CREDENTIALS:
-    'The university email or password entered is incorrect. Please check and try again.',
-  AUTH_EMAIL_IN_USE:
-    'An account with this university email already exists. Please sign in instead.',
+    'The email or password entered is incorrect. Please check and try again.',
+  AUTH_EMAIL_IN_USE: 'An account with this email already exists. Please sign in instead.',
   AUTH_WEAK_PASSWORD: 'Please choose a stronger password with at least 8 characters.',
   AUTH_FORBIDDEN: 'You do not have permission to modify this campus resource.',
   STORAGE_UPLOAD_FAILED:

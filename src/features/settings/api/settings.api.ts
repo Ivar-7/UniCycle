@@ -6,22 +6,22 @@ import type { StudentSettings } from './settings.types';
 const LOCAL_SETTINGS_KEY = 'unicycle.preferences.v1';
 
 export const CAMPUS_HALL_OPTIONS: readonly string[] = [
-  'North Hall Residence · Block B',
-  'Oakwood Student Village',
-  'Eastgate Courts · Block A',
-  'Westgate Student Village',
+  'Student Center · Main Entrance',
+  'Main Library Plaza',
+  'Science Complex Courtyard',
+  'Engineering Block Lobby',
   'Central Campus Union Hub',
-  'Riverside Courts',
+  'Sports Complex Entrance',
 ];
 
 const DEFAULT_SETTINGS: StudentSettings = {
-  defaultCampusHall: 'North Hall Residence · Block B',
+  defaultCampusHall: 'Student Center · Main Entrance',
   priceDropAlerts: true,
   instantMessageAlerts: true,
   pickupReminders: true,
   showVerifiedBadgePublicly: true,
   ecoImpactPublic: true,
-  preferredCurrency: 'USD',
+  preferredCurrency: 'KES',
 };
 
 export function readLocalPreferences(): StudentSettings {

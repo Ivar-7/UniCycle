@@ -5,7 +5,7 @@ export const studentProfileSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
   universityEmail: z.string().email(),
   universityName: z.string().min(2),
-  residenceHall: z.string().min(2, 'Residence hall is required'),
+  residenceHall: z.string().min(2, 'Campus pickup point is required'),
   isVerifiedStudent: z.boolean(),
   itemsReusedCount: z.number().int().nonnegative(),
   wasteDivertedKg: z.number().nonnegative(),
@@ -15,5 +15,5 @@ export const studentProfileSchema = z.object({
 
 export const updateProfileInputSchema = z.object({
   fullName: z.string().trim().min(2, 'Full name must be at least 2 characters'),
-  residenceHall: z.string().trim().min(2, 'Residence hall is required'),
+  residenceHall: z.string().trim().min(2, 'Campus pickup point is required'),
 });

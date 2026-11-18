@@ -5,7 +5,7 @@ export const sellerListingSchema = z.object({
   sellerId: z.string().min(1),
   title: z.string().min(2, 'Item title must be at least 2 characters').max(140),
   category: z.enum(['tech', 'bags', 'apparel', 'outdoor', 'furniture', 'kitchenware']),
-  price: z.number().positive().max(50000),
+  price: z.number().positive().max(1000000),
   status: z.enum(['active', 'reserved', 'sold']),
   viewsCount: z.number().int().nonnegative(),
   pickupHall: z.string().min(2).max(120),
@@ -17,6 +17,6 @@ export const sellerListingSchema = z.object({
 export const createListingInputSchema = z.object({
   title: z.string().min(2, 'Enter an item name (at least 2 characters)').max(140),
   category: z.enum(['tech', 'bags', 'apparel', 'outdoor', 'furniture', 'kitchenware']),
-  price: z.number().positive('Price must be greater than 0').max(50000, 'Price is too high'),
-  pickupHall: z.string().min(2, 'Specify a campus pickup hall').max(120),
+  price: z.number().positive('Price must be greater than 0').max(1000000, 'Price is too high'),
+  pickupHall: z.string().min(2, 'Specify a campus pickup point').max(120),
 });

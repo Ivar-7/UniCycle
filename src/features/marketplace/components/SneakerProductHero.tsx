@@ -37,10 +37,10 @@ interface HeroSizeOption {
 }
 
 const SIZES: readonly HeroSizeOption[] = [
-  { label: '36', price: 240, rating: 4.2, reviews: 86 },
-  { label: '37', price: 250, rating: 4.6, reviews: 142 },
-  { label: '38', price: 255, rating: 4.5, reviews: 94 },
-  { label: '39', price: 265, rating: 4.8, reviews: 59 },
+  { label: '36', price: 24000, rating: 4.2, reviews: 86 },
+  { label: '37', price: 25000, rating: 4.6, reviews: 142 },
+  { label: '38', price: 25500, rating: 4.5, reviews: 94 },
+  { label: '39', price: 26500, rating: 4.8, reviews: 59 },
 ];
 
 function buildVariantAngles(sideSrc: string, frontSrc: string): readonly HeroSneakerAngle[] {
@@ -231,7 +231,7 @@ export function SneakerProductHero() {
         listingId: 'volt-runners',
         title: `Kestrel Vapor Pace 3 (${activeVariant.name} · Size ${activeSize.label})`,
         price: activeSize.price,
-        campusLocation: 'Eastgate Courts · Block A',
+        campusLocation: 'Eastgate Courtyard',
         sellerName: 'Elena · Postgrad Design',
         inStock: true,
       });
@@ -256,7 +256,7 @@ export function SneakerProductHero() {
         listingId: 'volt-runners',
         title: 'Kestrel Vapor Pace 3',
         price: activeSize.price,
-        campusLocation: 'Eastgate Courts · Block A',
+        campusLocation: 'Eastgate Courtyard',
         sellerName: 'Elena · Postgrad Design',
         inStock: true,
       });
@@ -295,7 +295,7 @@ export function SneakerProductHero() {
               to="/item/volt-runners"
               className="inline-flex items-center gap-1 pt-1 text-xs font-medium text-zinc-700 underline decoration-zinc-400/70 underline-offset-4 hover:text-zinc-900 hover:decoration-zinc-900 dark:text-zinc-300 dark:decoration-zinc-600 dark:hover:text-zinc-100 dark:hover:decoration-zinc-100"
             >
-              <span>Eastgate Courts · View Listing &amp; Buy</span>
+              <span>Eastgate Courtyard · View Listing &amp; Buy</span>
               <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           </div>
@@ -330,7 +330,7 @@ export function SneakerProductHero() {
               type="button"
               aria-label="View all 5 photos"
               onClick={() => setGalleryOpenIndex(0)}
-              className="flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-300/80 bg-white/85 text-xs font-bold text-zinc-800 shadow-xs transition-all hover:border-zinc-900 hover:text-zinc-950 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-zinc-300 dark:hover:text-white"
+              className="flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-300/80 bg-white/85 text-xs font-bold text-zinc-800 shadow-xs transition-all hover:border-sky-700 hover:text-sky-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-sky-400 dark:hover:text-sky-300"
             >
               +2
             </button>
@@ -441,8 +441,8 @@ export function SneakerProductHero() {
                     className={cn(
                       'flex h-11 w-11 items-center justify-center rounded-full border text-xs font-semibold transition-all',
                       isSelected
-                        ? 'border-zinc-400 bg-zinc-200/80 text-zinc-900 shadow-xs dark:border-zinc-500 dark:bg-zinc-700 dark:text-zinc-100'
-                        : 'border-zinc-300 bg-white/70 text-zinc-700 hover:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900/50 dark:text-zinc-300 dark:hover:border-zinc-500',
+                        ? 'border-sky-700 bg-sky-700 text-white shadow-xs dark:border-sky-600 dark:bg-sky-700 dark:text-sky-50'
+                        : 'border-zinc-300 bg-white/70 text-zinc-900 hover:border-sky-700 dark:border-zinc-700 dark:bg-zinc-900/50 dark:text-zinc-100 dark:hover:border-sky-500',
                       soldOut && 'cursor-not-allowed line-through opacity-45',
                     )}
                   >
@@ -463,7 +463,7 @@ export function SneakerProductHero() {
                     ? 'bg-zinc-400'
                     : lowStockCount
                       ? 'bg-amber-500'
-                      : 'bg-zinc-500 dark:bg-zinc-400',
+                      : 'bg-sky-600 dark:bg-sky-400',
                 )}
               />
               <span>
@@ -518,7 +518,7 @@ export function SneakerProductHero() {
                       'h-8 w-8 rounded-full transition-transform hover:scale-110',
                       variant.swatchClass,
                       isSelected &&
-                        'ring-2 ring-zinc-500 ring-offset-2 ring-offset-stone-100 dark:ring-zinc-400 dark:ring-offset-zinc-900',
+                        'ring-2 ring-sky-700 ring-offset-2 ring-offset-stone-100 dark:ring-sky-400 dark:ring-offset-zinc-900',
                     )}
                   />
                 );
@@ -533,10 +533,10 @@ export function SneakerProductHero() {
               disabled={isSoldOut}
               onClick={() => void handleAddToBag()}
               className={cn(
-                'flex h-12 flex-1 items-center justify-center gap-2 rounded-lg border text-xs font-bold tracking-widest uppercase shadow-2xs transition-all disabled:cursor-not-allowed disabled:opacity-40',
+                'flex h-12 flex-1 items-center justify-center gap-2 rounded-lg text-xs font-bold tracking-widest uppercase shadow-xs transition-all disabled:cursor-not-allowed disabled:opacity-40',
                 addedState
-                  ? 'border-zinc-400 bg-zinc-300 text-zinc-900 dark:border-zinc-500 dark:bg-zinc-700 dark:text-zinc-100'
-                  : 'border-zinc-300 bg-zinc-200/85 text-zinc-900 hover:bg-zinc-300/85 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700',
+                  ? 'bg-sky-800 text-white dark:bg-sky-600 dark:text-white'
+                  : 'bg-sky-700 text-white hover:bg-sky-800 dark:bg-sky-700 dark:text-sky-50 dark:hover:bg-sky-600',
               )}
             >
               {addedState ? (
@@ -575,11 +575,11 @@ export function SneakerProductHero() {
           className="mt-4 flex items-center justify-center sm:absolute sm:bottom-4 sm:left-1/2 sm:mt-0 sm:-translate-x-1/2"
         >
           <div className="inline-flex items-center gap-3 rounded-full border border-zinc-200 bg-white px-4 py-1.5 text-xs font-medium text-zinc-900 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
-            <span className="h-2 w-2 rounded-full bg-zinc-900 dark:bg-zinc-100" />
+            <span className="h-2 w-2 rounded-full bg-sky-600 dark:bg-sky-400" />
             <span>{toastMessage}</span>
             <Link
               to="/wishlist"
-              className="font-semibold text-zinc-900 underline-offset-4 hover:underline dark:text-zinc-100"
+              className="font-semibold text-sky-700 underline-offset-4 hover:underline dark:text-sky-400"
             >
               View Bag
             </Link>

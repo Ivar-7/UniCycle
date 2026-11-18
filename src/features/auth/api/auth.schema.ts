@@ -1,21 +1,12 @@
 import { z } from 'zod';
 
 export const studentSignInSchema = z.object({
-  universityEmail: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .email('Enter a valid university email address')
-    .refine(
-      (email) => email.endsWith('.ac.uk') || email.endsWith('.edu'),
-      'Must be an academic university email (.ac.uk or .edu)',
-    ),
+  email: z.string().trim().toLowerCase().email('Enter a valid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
 export const studentRegisterSchema = studentSignInSchema.extend({
-  fullName: z.string().trim().min(2, 'Enter your full student name').max(100),
-  residenceHall: z.string().trim().min(2, 'Select or enter your residence hall').max(120),
+  fullName: z.string().trim().min(2, 'Enter your full name').max(100),
 });
 
 export const authSessionSummarySchema = z.object({

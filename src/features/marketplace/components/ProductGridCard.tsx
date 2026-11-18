@@ -116,7 +116,7 @@ export function ProductGridCard({ product, index }: ProductGridCardProps) {
                 className={cn(
                   'inline-flex shrink-0 items-center gap-1 rounded-lg border px-2.5 py-1.5 text-xs font-semibold whitespace-nowrap transition-colors',
                   product.inStock
-                    ? 'border-zinc-300 bg-zinc-100 text-zinc-900 hover:bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700'
+                    ? 'border-zinc-300 bg-white text-zinc-800 hover:border-sky-700 hover:bg-sky-700 hover:text-white dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:border-sky-600 dark:hover:bg-sky-700 dark:hover:text-sky-50'
                     : 'border-zinc-200 bg-transparent text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200',
                 )}
               >
@@ -127,7 +127,7 @@ export function ProductGridCard({ product, index }: ProductGridCardProps) {
                 to={messageUrl}
                 aria-label={`Message ${product.sellerName}`}
                 title="Message Seller"
-                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-700 transition-colors hover:border-zinc-400 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:border-zinc-500 dark:hover:bg-zinc-700"
+                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-700 transition-colors hover:border-sky-700 hover:text-sky-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:border-sky-400 dark:hover:text-sky-300"
               >
                 <MessageSquare className="h-3.5 w-3.5" />
               </Link>

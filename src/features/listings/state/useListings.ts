@@ -48,7 +48,7 @@ export function useListings() {
   const handleCreate = useCallback(
     async (input: CreateListingInput): Promise<boolean> => {
       if (!user) {
-        setActionError('Please sign in with your university account to publish a listing.');
+        setActionError('Please sign in to publish a listing.');
         return false;
       }
       setIsSubmitting(true);

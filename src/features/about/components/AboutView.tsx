@@ -32,21 +32,21 @@ export function AboutView() {
       <section className="rounded-3xl border border-zinc-200 bg-stone-100/80 px-6 py-12 sm:px-12 lg:py-18 dark:border-zinc-800 dark:bg-zinc-900/70">
         <div className="mx-auto max-w-3xl space-y-6 text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-zinc-300 bg-white px-3.5 py-1 text-xs font-medium text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
-            <Leaf className="h-3.5 w-3.5 text-zinc-700 dark:text-zinc-300" />
+            <Leaf className="h-3.5 w-3.5 text-sky-700 dark:text-sky-400" />
             Our Circular Campus Mission
           </span>
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-5xl dark:text-zinc-100">
-            Ending end-of-term landfill waste, one dorm room at a time.
+            Ending end-of-term landfill waste across campus.
           </h1>
           <p className="text-sm leading-relaxed text-zinc-600 sm:text-base dark:text-zinc-400">
-            Every June, thousands of perfectly good desk lamps, kettles, chairs, and cookware sets
-            are discarded when students move out of halls—only for incoming students to buy the
-            exact same items brand new in September. UniCycle closes the loop.
+            Every semester, thousands of perfectly good desk lamps, kettles, chairs, and cookware
+            sets are discarded when students move out—only for incoming students to buy the exact
+            same items brand new. UniCycle closes the loop.
           </p>
           <div className="flex flex-wrap justify-center gap-3 pt-2">
             <Link
               to="/"
-              className="inline-flex items-center gap-2 rounded-xl border border-zinc-300 bg-zinc-200/80 px-5 py-2.5 text-xs font-semibold text-zinc-900 transition-colors hover:bg-zinc-300/80 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+              className="inline-flex items-center gap-2 rounded-xl bg-sky-700 px-5 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-sky-800 dark:bg-sky-700 dark:text-sky-50 dark:hover:bg-sky-600"
             >
               Browse Shop
               <ArrowRight className="h-4 w-4" />
@@ -89,7 +89,7 @@ export function AboutView() {
           {
             icon: Tag,
             title: '1. List in 60 Seconds',
-            body: 'Snap a photo, tag your residence hall, and set a student-friendly price before moving out.',
+            body: 'Snap a photo, tag your campus pickup spot, and set a student-friendly price before moving out.',
           },
           {
             icon: Sparkles,
@@ -98,8 +98,8 @@ export function AboutView() {
           },
           {
             icon: ShieldCheck,
-            title: '3. Safe Hall Handover',
-            body: 'Meet at verified residence hall receptions or the Students Union with zero shipping packaging.',
+            title: '3. Safe Campus Handover',
+            body: 'Meet at verified campus pickup points or the Student Center with zero shipping packaging.',
           },
         ].map((step) => {
           const Icon = step.icon;

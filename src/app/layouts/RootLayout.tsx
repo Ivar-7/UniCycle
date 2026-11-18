@@ -54,6 +54,10 @@ export function RootLayout() {
 
   const savedCount = entries.length;
   const accountLabel = user ? resolveDisplayName(user, 'Account') : 'Account';
+  const signInTarget =
+    location.pathname === '/auth'
+      ? '/auth'
+      : `/auth?redirect=${encodeURIComponent(currentRouteKey)}`;
 
   useEffect(() => {
     if (!mobileMenuOpen) {
@@ -77,7 +81,7 @@ export function RootLayout() {
     <div className="flex min-h-dvh flex-col overflow-x-clip bg-white text-zinc-900 transition-colors dark:bg-zinc-950 dark:text-zinc-100">
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-xl focus:bg-zinc-900 focus:px-4 focus:py-2 focus:text-xs focus:font-semibold focus:text-white dark:focus:bg-zinc-100 dark:focus:text-zinc-950"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-xl focus:bg-sky-700 focus:px-4 focus:py-2 focus:text-xs focus:font-semibold focus:text-white dark:focus:bg-sky-700 dark:focus:text-sky-50"
       >
         Skip to content
       </a>
@@ -110,7 +114,7 @@ export function RootLayout() {
                     cn(
                       'inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors',
                       isActive
-                        ? 'border border-zinc-300 bg-zinc-100 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100'
+                        ? 'border border-sky-200 bg-sky-50 text-sky-900 dark:border-sky-800/70 dark:bg-sky-950/60 dark:text-sky-200'
                         : 'border border-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100',
                     )
                   }
@@ -131,7 +135,7 @@ export function RootLayout() {
                 cn(
                   'relative inline-flex h-9 items-center gap-1.5 rounded-xl border px-2.5 text-xs font-medium transition-colors',
                   isActive
-                    ? 'border-zinc-300 bg-zinc-100 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100'
+                    ? 'border-sky-200 bg-sky-50 text-sky-900 dark:border-sky-800/70 dark:bg-sky-950/60 dark:text-sky-200'
                     : 'border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800',
                 )
               }
@@ -139,7 +143,7 @@ export function RootLayout() {
               <Heart className="h-4 w-4" />
               <span className="hidden sm:inline">Saved</span>
               {savedCount > 0 ? (
-                <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-zinc-200 px-1 text-xs font-semibold tabular-nums text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100">
+                <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-sky-700 px-1 text-xs font-semibold tabular-nums text-white dark:bg-sky-700 dark:text-sky-50">
                   {savedCount}
                 </span>
               ) : null}
@@ -163,7 +167,7 @@ export function RootLayout() {
               </Link>
             ) : (
               <Link
-                to="/auth"
+                to={signInTarget}
                 className="hidden h-9 items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-100 sm:inline-flex dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
               >
                 <LogIn className="h-3.5 w-3.5 shrink-0" />
@@ -237,7 +241,7 @@ export function RootLayout() {
                       cn(
                         'flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors',
                         isActive
-                          ? 'border border-zinc-300 bg-zinc-100 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100'
+                          ? 'border border-sky-200 bg-sky-50 text-sky-900 dark:border-sky-800/70 dark:bg-sky-950/60 dark:text-sky-200'
                           : 'text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-900',
                       )
                     }
@@ -247,7 +251,7 @@ export function RootLayout() {
                       {item.label}
                     </span>
                     {item.to === '/wishlist' && savedCount > 0 ? (
-                      <span className="rounded-full bg-zinc-200 px-2 py-0.5 text-xs font-semibold text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100">
+                      <span className="rounded-full bg-sky-700 px-2 py-0.5 text-xs font-semibold text-white dark:bg-sky-700 dark:text-sky-50">
                         {savedCount}
                       </span>
                     ) : null}
@@ -259,21 +263,21 @@ export function RootLayout() {
             <div className="border-t border-zinc-200 p-4 dark:border-zinc-800">
               {user ? (
                 <Link
-                  to="/auth"
+                  to="/profile"
                   className="flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-xs font-medium text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
                 >
                   <span className="truncate">{user.email}</span>
                   <span className="ml-2 shrink-0 font-semibold text-zinc-900 dark:text-zinc-100">
-                    Account
+                    Profile
                   </span>
                 </Link>
               ) : (
                 <Link
-                  to="/auth"
-                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-2.5 text-xs font-semibold text-zinc-900 hover:bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+                  to={signInTarget}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-xs font-semibold text-zinc-800 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
                 >
                   <LogIn className="h-4 w-4" />
-                  Student Sign In
+                  Sign In
                 </Link>
               )}
             </div>
@@ -296,7 +300,7 @@ export function RootLayout() {
               UniCycle — Student Marketplace for Pre-Owned Household Essentials
             </p>
             <p>
-              Promoting campus reuse, student affordability, and zero-waste hall-to-hall handovers.
+              Promoting campus reuse, student affordability, and zero-waste on-campus handovers.
             </p>
           </div>
 

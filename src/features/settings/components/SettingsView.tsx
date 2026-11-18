@@ -50,12 +50,12 @@ export function SettingsView() {
             Account & Display Settings
           </h1>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Configure your appearance theme, currency, default residence hall pickup point, and
-            campus alerts.
+            Configure your appearance theme, currency, default campus pickup point, and campus
+            alerts.
           </p>
         </div>
         {savedBanner ? (
-          <Badge tone="neutral">
+          <Badge tone="sky">
             <Check className="h-3.5 w-3.5" />
             {user ? 'Preferences Saved' : 'Saved on This Device'}
           </Badge>
@@ -93,7 +93,7 @@ export function SettingsView() {
             className={cn(
               'flex flex-col gap-4 rounded-2xl border p-5 text-left transition-all',
               theme === 'light'
-                ? 'border-zinc-400 bg-white ring-2 ring-zinc-400 dark:border-zinc-500 dark:bg-zinc-900 dark:ring-zinc-500'
+                ? 'border-sky-700 bg-white ring-2 ring-sky-700/25 dark:border-sky-500 dark:bg-zinc-900 dark:ring-sky-500/30'
                 : 'border-zinc-200 bg-white/60 hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/50',
             )}
           >
@@ -102,13 +102,13 @@ export function SettingsView() {
                 <Sun className="h-4 w-4 text-amber-500" />
                 Light Gallery
               </span>
-              {theme === 'light' ? <Badge tone="neutral">Active</Badge> : null}
+              {theme === 'light' ? <Badge tone="sky">Active</Badge> : null}
             </div>
             <div className="h-20 rounded-xl border border-stone-200 bg-stone-100 p-3">
               <div className="h-3 w-24 rounded-sm bg-zinc-800" />
               <div className="mt-2 h-2 w-36 rounded-sm bg-zinc-400" />
               <div className="mt-3 flex gap-2">
-                <span className="h-4 w-12 rounded-sm bg-zinc-900" />
+                <span className="h-4 w-12 rounded-sm bg-sky-700" />
                 <span className="h-4 w-4 rounded-full bg-amber-300" />
               </div>
             </div>
@@ -120,16 +120,16 @@ export function SettingsView() {
             className={cn(
               'flex flex-col gap-4 rounded-2xl border p-5 text-left transition-all',
               theme === 'dark'
-                ? 'border-zinc-400 bg-white ring-2 ring-zinc-400 dark:border-zinc-500 dark:bg-zinc-900 dark:ring-zinc-500'
+                ? 'border-sky-700 bg-white ring-2 ring-sky-700/25 dark:border-sky-500 dark:bg-zinc-900 dark:ring-sky-500/30'
                 : 'border-zinc-200 bg-white/60 hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/50',
             )}
           >
             <div className="flex items-center justify-between">
               <span className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                <Moon className="h-4 w-4 text-indigo-400" />
+                <Moon className="h-4 w-4 text-sky-500 dark:text-sky-400" />
                 Dark Studio
               </span>
-              {theme === 'dark' ? <Badge tone="neutral">Active</Badge> : null}
+              {theme === 'dark' ? <Badge tone="sky">Active</Badge> : null}
             </div>
             <div className="h-20 rounded-xl border border-zinc-800 bg-zinc-950 p-3">
               <div className="h-3 w-24 rounded-sm bg-zinc-100" />
@@ -158,7 +158,7 @@ export function SettingsView() {
               htmlFor="campus-hall-select"
               className="block text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400"
             >
-              Default Residence Hall Pickup Point
+              Default Campus Pickup Point
             </label>
             <select
               id="campus-hall-select"
@@ -187,11 +187,11 @@ export function SettingsView() {
                 id="currency-select"
                 value={settings.preferredCurrency}
                 onChange={(e) =>
-                  void updateSetting('preferredCurrency', e.target.value as 'USD' | 'GBP' | 'EUR')
+                  void updateSetting('preferredCurrency', e.target.value as 'KES' | 'GBP' | 'EUR')
                 }
                 className="w-full rounded-xl border border-zinc-200 bg-zinc-50 py-2.5 pr-3.5 pl-10 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100"
               >
-                <option value="USD">USD ($) — US Dollar</option>
+                <option value="KES">KES (Ksh) — Kenyan Shilling</option>
                 <option value="GBP">GBP (£) — British Pound</option>
                 <option value="EUR">EUR (€) — Euro</option>
               </select>
@@ -225,7 +225,7 @@ export function SettingsView() {
               {
                 key: 'pickupReminders' as const,
                 title: 'Handover Reminders',
-                desc: 'Remind 30 minutes before scheduled hall meetups.',
+                desc: 'Remind 30 minutes before scheduled campus meetups.',
               },
             ].map((item) => {
               const enabled = settings[item.key];
@@ -245,14 +245,14 @@ export function SettingsView() {
                     onClick={() => void updateSetting(item.key, !enabled)}
                     className={cn(
                       'relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors',
-                      enabled ? 'bg-zinc-600 dark:bg-zinc-500' : 'bg-zinc-300 dark:bg-zinc-800',
+                      enabled ? 'bg-sky-700 dark:bg-sky-600' : 'bg-zinc-300 dark:bg-zinc-800',
                     )}
                   >
                     <span
                       className={cn(
                         'inline-block h-3.5 w-3.5 rounded-full transition-transform',
                         enabled
-                          ? 'translate-x-4 bg-white dark:bg-zinc-100'
+                          ? 'translate-x-4 bg-white dark:bg-sky-50'
                           : 'translate-x-0.5 bg-white dark:bg-zinc-400',
                       )}
                     />
@@ -301,14 +301,14 @@ export function SettingsView() {
                     onClick={() => void updateSetting(item.key, !enabled)}
                     className={cn(
                       'relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors',
-                      enabled ? 'bg-zinc-600 dark:bg-zinc-500' : 'bg-zinc-300 dark:bg-zinc-800',
+                      enabled ? 'bg-sky-700 dark:bg-sky-600' : 'bg-zinc-300 dark:bg-zinc-800',
                     )}
                   >
                     <span
                       className={cn(
                         'inline-block h-3.5 w-3.5 rounded-full transition-transform',
                         enabled
-                          ? 'translate-x-4 bg-white dark:bg-zinc-100'
+                          ? 'translate-x-4 bg-white dark:bg-sky-50'
                           : 'translate-x-0.5 bg-white dark:bg-zinc-400',
                       )}
                     />

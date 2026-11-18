@@ -42,7 +42,7 @@ export function ListingsView() {
   const [showNewModal, setShowNewModal] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newCategory, setNewCategory] = useState<ProductCategory>('furniture');
-  const [newPrice, setNewPrice] = useState('45');
+  const [newPrice, setNewPrice] = useState('2500');
   const [newHall, setNewHall] = useState(defaultCampusHall);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
@@ -78,7 +78,7 @@ export function ListingsView() {
             My Campus Listings
           </h1>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Publish pre-owned household essentials and coordinate pickups from your residence hall.
+            Publish pre-owned household essentials and coordinate pickups on campus.
           </p>
         </div>
 
@@ -116,7 +116,7 @@ export function ListingsView() {
       ) : null}
 
       {showNewModal && user ? (
-        <Card className="space-y-5 border-zinc-900 dark:border-zinc-100">
+        <Card className="space-y-5 border-sky-700/60 dark:border-sky-500/60">
           <div className="flex items-center justify-between gap-3">
             <div>
               <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
@@ -207,7 +207,7 @@ export function ListingsView() {
                   htmlFor="new-item-hall"
                   className="block text-xs font-medium text-zinc-600 dark:text-zinc-400"
                 >
-                  Pickup Residence Hall
+                  Campus Pickup Point
                 </label>
                 <input
                   id="new-item-hall"
@@ -266,8 +266,8 @@ export function ListingsView() {
         <EmptyState
           icon={<LogIn className="h-6 w-6" />}
           title="Sign in to sell on UniCycle"
-          description="Verify your university email to publish pre-owned items and manage residence hall pickups."
-          actionLabel="Student Sign In"
+          description="Sign in with your email to publish pre-owned items and manage campus pickups."
+          actionLabel="Sign In"
           onAction={() => void navigate('/auth?redirect=/listings')}
         />
       ) : null}
@@ -278,7 +278,7 @@ export function ListingsView() {
         <EmptyState
           icon={<Store className="h-6 w-6" />}
           title="You haven't listed any items yet"
-          description="Moving out of halls soon? Turn your pre-owned kettle, desk lamp, or shelving into cash."
+          description="Clearing out your room soon? Turn your pre-owned kettle, desk lamp, or shelving into cash."
           actionLabel="Create First Listing"
           onAction={() => setShowNewModal(true)}
         />
@@ -319,7 +319,7 @@ export function ListingsView() {
                   <Badge
                     tone={
                       listing.status === 'active'
-                        ? 'neutral'
+                        ? 'sky'
                         : listing.status === 'reserved'
                           ? 'amber'
                           : 'slate'
@@ -369,7 +369,7 @@ export function ListingsView() {
                       {listing.status === 'active' ? (
                         <Link
                           to={`/item/${encodeURIComponent(listing.id)}`}
-                          className="inline-flex items-center gap-1 rounded-lg border border-zinc-300 bg-zinc-100 px-2.5 py-1.5 text-xs font-medium text-zinc-900 hover:bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+                          className="inline-flex items-center gap-1 rounded-lg bg-sky-700 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-sky-800 dark:bg-sky-700 dark:text-sky-50 dark:hover:bg-sky-600"
                         >
                           <span>View</span>
                           <ArrowUpRight className="h-3 w-3" />

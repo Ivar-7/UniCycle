@@ -5,5 +5,5 @@ export interface StudentSettings {
   readonly pickupReminders: boolean;
   readonly showVerifiedBadgePublicly: boolean;
   readonly ecoImpactPublic: boolean;
-  readonly preferredCurrency: 'USD' | 'GBP' | 'EUR';
+  readonly preferredCurrency: 'KES' | 'GBP' | 'EUR';
 }

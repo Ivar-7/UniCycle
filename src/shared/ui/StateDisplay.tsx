@@ -1,26 +1,47 @@
-import { AlertCircle, Inbox, Loader2, RefreshCw } from 'lucide-react';
+import { AlertCircle, Inbox, RefreshCw } from 'lucide-react';
 import { motion } from 'motion/react';
 import type { ReactNode } from 'react';
 import type { AppError } from '@/shared/errors';
+import { cn } from '@/shared/utils/cn';
 import { Button } from './Button';
-import { Card } from './Card';
+import { UniCycleLogo } from './UniCycleLogo';
 
 export interface LoadingStateProps {
   readonly label?: string;
+  readonly className?: string;
 }
 
-export function LoadingState({ label = 'Loading student marketplace data...' }: LoadingStateProps) {
+export function LoadingState({
+  label = 'Loading student marketplace data...',
+  className,
+}: LoadingStateProps) {
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      role="status"
+      aria-live="polite"
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
+      className={cn(
+        'flex min-h-80 w-full flex-col items-center justify-center px-6 py-16 text-center sm:min-h-96',
+        className,
+      )}
     >
-      <Card className="flex flex-col items-center justify-center py-16 text-center">
-        <Loader2 className="h-8 w-8 animate-spin text-zinc-600 dark:text-zinc-300" />
-        <p className="mt-3 text-sm font-medium text-zinc-600 dark:text-zinc-400">{label}</p>
-      </Card>
+      <div className="relative flex h-14 w-14 items-center justify-center">
+        <span
+          aria-hidden="true"
+          className="absolute -inset-2 rounded-full bg-sky-500/10 blur-md dark:bg-sky-400/10"
+        />
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 animate-spin rounded-full border-2 border-zinc-200 border-t-sky-700 dark:border-zinc-800 dark:border-t-sky-400"
+        />
+        <UniCycleLogo className="relative h-6 w-6 text-zinc-900 dark:text-zinc-100" />
+      </div>
+      <p className="mt-5 text-sm font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
+        {label}
+      </p>
     </motion.div>
   );
 }
@@ -39,21 +60,24 @@ export function EmptyState({ title, description, actionLabel, onAction, icon }: 
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
+      className="flex min-h-80 w-full flex-col items-center justify-center px-6 py-16 text-center"
     >
-      <Card className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-          {icon ?? <Inbox className="h-6 w-6" />}
+      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-800/70 dark:bg-sky-950/60 dark:text-sky-300">
+        {icon ?? <Inbox className="h-6 w-6" />}
+      </div>
+      <h3 className="mt-4 text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+        {title}
+      </h3>
+      <p className="mt-1.5 max-w-md text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+        {description}
+      </p>
+      {actionLabel && onAction ? (
+        <div className="mt-6">
+          <Button variant="primary" size="md" onClick={onAction}>
+            {actionLabel}
+          </Button>
         </div>
-        <h3 className="mt-4 text-base font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
-        <p className="mt-1 max-w-md text-sm text-zinc-600 dark:text-zinc-400">{description}</p>
-        {actionLabel && onAction ? (
-          <div className="mt-5">
-            <Button variant="primary" size="sm" onClick={onAction}>
-              {actionLabel}
-            </Button>
-          </div>
-        ) : null}
-      </Card>
+      ) : null}
     </motion.div>
   );
 }
@@ -69,26 +93,25 @@ export function ErrorState({ error, onRetry }: ErrorStateProps) {
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.2 }}
+      className="flex min-h-80 w-full flex-col items-center justify-center px-6 py-16 text-center"
     >
-      <Card className="flex flex-col items-center justify-center border-rose-200 bg-rose-50/50 py-14 text-center dark:border-rose-900/60 dark:bg-rose-950/20">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 text-rose-600 dark:bg-rose-950 dark:text-rose-400">
-          <AlertCircle className="h-6 w-6" />
+      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-rose-200 bg-rose-50 text-rose-600 dark:border-rose-900/60 dark:bg-rose-950/60 dark:text-rose-400">
+        <AlertCircle className="h-6 w-6" />
+      </div>
+      <h3 className="mt-4 text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+        Unable to load section
+      </h3>
+      <p className="mt-1.5 max-w-md text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+        {error.userMessage}
+      </p>
+      {onRetry ? (
+        <div className="mt-6">
+          <Button variant="outline" size="md" onClick={onRetry}>
+            <RefreshCw className="h-4 w-4" />
+            Retry
+          </Button>
         </div>
-        <h3 className="mt-4 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-          Unable to load section
-        </h3>
-        <p className="mt-1 max-w-md text-sm text-zinc-600 dark:text-zinc-400">
-          {error.userMessage}
-        </p>
-        {onRetry ? (
-          <div className="mt-5">
-            <Button variant="outline" size="sm" onClick={onRetry}>
-              <RefreshCw className="h-3.5 w-3.5" />
-              Retry
-            </Button>
-          </div>
-        ) : null}
-      </Card>
+      ) : null}
     </motion.div>
   );
 }

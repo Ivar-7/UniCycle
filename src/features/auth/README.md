@@ -1,7 +1,7 @@
 # Auth Feature
 
 ## Purpose
-Handles university student authentication, `.ac.uk` / `.edu` campus email validation at the form boundary, and Firebase Auth session status.
+Handles account authentication, email and password validation at the form boundary, and Firebase Auth session status.
 
 ## Structure
 - `api/` — Types, Zod form validation schema, query keys, and Firebase auth wrapper methods (`auth.api.ts`, `auth.keys.ts`, `auth.schema.ts`, `auth.types.ts`).

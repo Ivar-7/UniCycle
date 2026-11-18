@@ -43,7 +43,7 @@ export async function signInStudentWithFirebase(
   try {
     const userCredential = await signInWithEmailAndPassword(
       firebaseAuth,
-      validated.universityEmail,
+      validated.email,
       validated.password,
     );
     const summary = buildSessionSummary(userCredential.user);
@@ -65,19 +65,20 @@ export async function registerStudentWithFirebase(
   try {
     const userCredential = await createUserWithEmailAndPassword(
       firebaseAuth,
-      validated.universityEmail,
+      validated.email,
       validated.password,
     );
     const user = userCredential.user;
     await updateProfile(user, { displayName: validated.fullName });
 
+    const hasCampusDomain = isCampusEmail(validated.email);
     const newProfile: StudentProfile = {
       id: user.uid,
       fullName: validated.fullName,
-      universityEmail: validated.universityEmail,
-      universityName: 'Verified Campus Member',
-      residenceHall: validated.residenceHall,
-      isVerifiedStudent: true,
+      universityEmail: validated.email,
+      universityName: hasCampusDomain ? 'Verified Campus Member' : 'Campus Community Member',
+      residenceHall: 'Student Center · Main Entrance',
+      isVerifiedStudent: hasCampusDomain,
       itemsReusedCount: 0,
       wasteDivertedKg: 0,
       rating: 5.0,
@@ -87,9 +88,9 @@ export async function registerStudentWithFirebase(
 
     return authSessionSummarySchema.parse({
       uid: user.uid,
-      email: validated.universityEmail,
+      email: validated.email,
       fullName: validated.fullName,
-      verifiedCampusDomain: true,
+      verifiedCampusDomain: hasCampusDomain,
     });
   } catch (err: unknown) {
     logDiagnosticError(err, 'auth.api.registerStudentWithFirebase');
@@ -98,7 +99,7 @@ export async function registerStudentWithFirebase(
 }
 
 export async function sendStudentPasswordReset(email: string): Promise<void> {
-  const validEmail = studentSignInSchema.shape.universityEmail.parse(email);
+  const validEmail = studentSignInSchema.shape.email.parse(email);
   try {
     await sendPasswordResetEmail(firebaseAuth, validEmail);
   } catch (err: unknown) {

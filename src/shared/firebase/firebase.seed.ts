@@ -14,7 +14,7 @@ import { logDiagnosticError, normalizeError } from '@/shared/errors';
 import { readJsonStorage, writeJsonStorage } from '@/shared/utils/storage';
 import { firestoreDb } from './firebase.config';
 
-const LOCAL_CACHE_PREFIX = 'unicycle_cache_v4_';
+const LOCAL_CACHE_PREFIX = 'unicycle_cache_v5_';
 
 function readLocalCache<T>(key: string, schema: z.ZodType<T>): T | null {
   return readJsonStorage(`${LOCAL_CACHE_PREFIX}${key}`, schema);

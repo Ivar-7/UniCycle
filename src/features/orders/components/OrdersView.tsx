@@ -33,7 +33,7 @@ export function OrdersView() {
           Campus Pickups & Orders
         </h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Present your pickup pass code when meeting student sellers at residence hall lobbies.
+          Present your pickup pass code when meeting sellers at campus pickup points.
         </p>
       </div>
 
@@ -62,8 +62,8 @@ export function OrdersView() {
         <EmptyState
           icon={<LogIn className="h-6 w-6" />}
           title="Sign in to view scheduled pickups"
-          description="Sign in with your university email to track reserved items and handover verification codes."
-          actionLabel="Student Sign In"
+          description="Sign in with your email to track reserved items and handover verification codes."
+          actionLabel="Sign In"
           onAction={() => void navigate('/auth?redirect=/orders')}
         />
       ) : null}
@@ -74,7 +74,7 @@ export function OrdersView() {
         <EmptyState
           icon={<ShoppingBag className="h-6 w-6" />}
           title="No scheduled pickups yet"
-          description="Save items to your bag and reserve them for campus residence hall collection."
+          description="Save items to your bag and reserve them for on-campus collection."
           actionLabel="Browse Shop"
           onAction={() => void navigate('/')}
         />
@@ -98,7 +98,7 @@ export function OrdersView() {
                       <Badge
                         tone={
                           order.status === 'completed'
-                            ? 'neutral'
+                            ? 'sky'
                             : order.status === 'cancelled'
                               ? 'slate'
                               : 'amber'
@@ -136,7 +136,7 @@ export function OrdersView() {
                       <button
                         type="button"
                         onClick={() => void changeOrderStatus(order, 'completed')}
-                        className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-300 bg-zinc-200/80 px-3.5 py-2 text-xs font-semibold text-zinc-900 transition-colors hover:bg-zinc-300/80 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-sky-700 px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-sky-800 dark:bg-sky-700 dark:text-sky-50 dark:hover:bg-sky-600"
                       >
                         <CheckCircle2 className="h-3.5 w-3.5" />
                         Confirm Handover

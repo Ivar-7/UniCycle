@@ -7,6 +7,7 @@ import {
   GraduationCap,
   Leaf,
   LogIn,
+  LogOut,
   MapPin,
   Package,
   Settings,
@@ -26,7 +27,7 @@ const STUDENT_REVIEWS = [
     reviewer: 'Noah · 3rd Year Economics',
     item: 'Nordic Architect Desk Lamp',
     rating: 5,
-    comment: 'Super easy handover outside North Hall Block B. Lamp looks brand new!',
+    comment: 'Super easy handover outside the Student Center. Lamp looks brand new!',
     date: '2 days ago',
   },
   {
@@ -49,9 +50,11 @@ export function ProfileView() {
     profile,
     error,
     isSaving,
+    isSigningOut,
     saveError,
     saveSuccess,
     saveProfile,
+    signOut,
     reload,
   } = useProfile();
 
@@ -69,9 +72,9 @@ export function ProfileView() {
       <div className="pb-16">
         <EmptyState
           icon={<LogIn className="h-6 w-6" />}
-          title="Sign in to view your student profile"
-          description="Verify your university email to manage your residence hall pickup details and circular impact."
-          actionLabel="Student Sign In"
+          title="Sign in to view your profile"
+          description="Sign in with your email to manage your campus pickup details and circular impact."
+          actionLabel="Sign In"
           onAction={() => void navigate('/auth?redirect=/profile')}
         />
       </div>
@@ -126,7 +129,7 @@ export function ProfileView() {
                 className="h-20 w-20 shrink-0 rounded-2xl object-cover ring-2 ring-zinc-900/10 dark:ring-white/15"
               />
             ) : (
-              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border border-zinc-300 bg-zinc-200/80 text-2xl font-bold text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border border-sky-200 bg-sky-50 text-2xl font-bold text-sky-900 dark:border-sky-800/70 dark:bg-sky-950/60 dark:text-sky-200">
                 {initials || 'UC'}
               </div>
             )}
@@ -136,13 +139,13 @@ export function ProfileView() {
                   {profile.fullName}
                 </h1>
                 {profile.isVerifiedStudent ? (
-                  <Badge tone="neutral">
+                  <Badge tone="sky">
                     <ShieldCheck className="h-3.5 w-3.5" />
                     Verified Student
                   </Badge>
                 ) : null}
                 {saveSuccess ? (
-                  <Badge tone="neutral">
+                  <Badge tone="sky">
                     <Check className="h-3.5 w-3.5" />
                     Profile Saved
                   </Badge>
@@ -182,13 +185,31 @@ export function ProfileView() {
             </Link>
             <Link
               to="/listings"
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-zinc-200/80 px-4 py-2.5 text-xs font-semibold text-zinc-900 transition-colors hover:bg-zinc-300/80 sm:flex-initial dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-sky-700 px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-sky-800 sm:flex-initial dark:bg-sky-700 dark:text-sky-50 dark:hover:bg-sky-600"
             >
               <Package className="h-4 w-4" />
               My Listings
             </Link>
+            <button
+              type="button"
+              disabled={isSigningOut}
+              onClick={() => void signOut()}
+              className="inline-flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-xs font-semibold text-zinc-800 transition-colors hover:bg-zinc-100 disabled:opacity-50 sm:flex-initial dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign Out
+            </button>
           </div>
         </div>
+
+        {saveError ? (
+          <div
+            role="alert"
+            className="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-medium text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300"
+          >
+            {saveError}
+          </div>
+        ) : null}
 
         {/* Inline Profile Editor */}
         {isEditing ? (
@@ -210,15 +231,6 @@ export function ProfileView() {
               })();
             }}
           >
-            {saveError ? (
-              <div
-                role="alert"
-                className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-medium text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300"
-              >
-                {saveError}
-              </div>
-            ) : null}
-
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div className="space-y-1.5">
                 <label
@@ -242,7 +254,7 @@ export function ProfileView() {
                   htmlFor="profile-hall"
                   className="block text-xs font-medium text-zinc-700 dark:text-zinc-300"
                 >
-                  Residence Hall Pickup Point
+                  Campus Pickup Point
                 </label>
                 <input
                   id="profile-hall"
@@ -303,7 +315,7 @@ export function ProfileView() {
             {profile.wasteDivertedKg} kg
           </p>
           <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
-            Dorm furniture, kitchenware, and tech diverted from landfill across{' '}
+            Furniture, kitchenware, and tech diverted from landfill across{' '}
             {profile.itemsReusedCount} campus handovers.
           </p>
         </Card>
@@ -320,7 +332,8 @@ export function ProfileView() {
             <StarRating value={profile.rating} size="sm" />
           </div>
           <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
-            Punctual hall-to-hall pickups · Verified student member.
+            Punctual campus pickups ·{' '}
+            {profile.isVerifiedStudent ? 'Verified student member.' : 'Campus community member.'}
           </p>
         </Card>
 
@@ -346,7 +359,7 @@ export function ProfileView() {
             <span className="font-medium text-zinc-900 dark:text-zinc-100">
               Nordic Architect Desk Lamp
             </span>
-            <span className="font-bold text-zinc-900 dark:text-zinc-100">{formatPrice(48)}</span>
+            <span className="font-bold text-zinc-900 dark:text-zinc-100">{formatPrice(4800)}</span>
           </div>
         </Card>
       </div>

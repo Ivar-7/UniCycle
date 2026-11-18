@@ -7,20 +7,20 @@ const SEED_ABOUT_DATA: AboutOverviewData = {
     {
       id: 'waste',
       value: '14.6 Tons',
-      label: 'Dorm Waste Diverted',
+      label: 'Campus Waste Diverted',
       detail: 'Furniture, appliances, and cookware kept in active student circulation.',
     },
     {
       id: 'savings',
-      value: '$184,000+',
+      value: 'Ksh 2.4M+',
       label: 'Saved by Students',
       detail: 'Average 62% savings compared to buying brand-new retail household goods.',
     },
     {
       id: 'campuses',
-      value: '18 Halls',
+      value: '18 Hubs',
       label: 'Connected Pickup Hubs',
-      detail: 'Safe, step-free lobby handover zones across university residences.',
+      detail: 'Safe, convenient handover zones across university campus.',
     },
   ],
   faqs: [
@@ -28,13 +28,13 @@ const SEED_ABOUT_DATA: AboutOverviewData = {
       id: 'faq-1',
       question: 'Who can buy and sell on UniCycle?',
       answer:
-        'Only verified university students and staff with an active .ac.uk or .edu academic email address can list or reserve items, ensuring a trusted campus-only community.',
+        'Anyone with a UniCycle account—using any personal or university email address—can list pre-owned essentials or reserve items for on-campus pickup.',
     },
     {
       id: 'faq-2',
-      question: 'How do campus hall pickups work?',
+      question: 'How do campus pickups work?',
       answer:
-        'When you reserve an item, you and the student seller pick a convenient time at a designated Residence Hall reception or Students Union hub—no shipping boxes or courier fees required.',
+        'When you reserve an item, you and the seller pick a convenient time at a designated campus pickup point or Student Center hub—no shipping boxes or courier fees required.',
     },
     {
       id: 'faq-3',
