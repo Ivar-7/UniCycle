@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useAsyncState, type AsyncStatus } from '@/shared/hooks/useAsyncState';
+import { useAsyncState } from '@/shared/hooks/useAsyncState';
+import { usePreferences } from '@/shared/hooks/usePreferences';
 import {
   CATEGORIES,
   COLOURS,
@@ -53,6 +54,7 @@ function matchesProduct(
 }
 
 export function useMarketplace() {
+  const { formatPrice } = usePreferences();
   const { state, setLoading, setEmpty, setSuccess, setError } = useAsyncState<MarketplaceProduct[]>(
     [],
     'loading',
@@ -168,7 +170,7 @@ export function useMarketplace() {
     if (filters.minPrice !== PRICE_MIN || filters.maxPrice !== PRICE_MAX) {
       chips.push({
         key: 'price',
-        label: `$${filters.minPrice} to $${filters.maxPrice}`,
+        label: `${formatPrice(filters.minPrice)} to ${formatPrice(filters.maxPrice)}`,
         onRemove: () => setPriceRange(PRICE_MIN, PRICE_MAX),
       });
     }
@@ -210,6 +212,7 @@ export function useMarketplace() {
     return chips;
   }, [
     filters,
+    formatPrice,
     setInStockOnly,
     setPriceRange,
     setRatingFilter,
@@ -217,21 +220,6 @@ export function useMarketplace() {
     toggleCategory,
     toggleColour,
   ]);
-
-  const simulateStatus = useCallback(
-    (status: AsyncStatus) => {
-      if (status === 'loading') {
-        setLoading();
-      } else if (status === 'empty') {
-        setEmpty();
-      } else if (status === 'error') {
-        setError(new Error('Simulated catalogue error'));
-      } else {
-        void loadProducts();
-      }
-    },
-    [loadProducts, setEmpty, setError, setLoading],
-  );
 
   return {
     status: state.status,
@@ -252,6 +240,5 @@ export function useMarketplace() {
     setSearchQuery,
     clearAllFilters,
     reload: loadProducts,
-    simulateStatus,
   };
 }

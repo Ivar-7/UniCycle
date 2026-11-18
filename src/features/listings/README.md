@@ -6,5 +6,5 @@ Allows university students to list pre-owned household items for sale, track vie
 ## Structure
 - `api/` — Types, Zod validation schemas, query keys, and listing API methods (`listings.api.ts`, `listings.keys.ts`, `listings.schema.ts`, `listings.types.ts`).
 - `state/` — Hook for seller listings and local interaction state (`useListings.ts`).
-- `components/` — Seller listings placeholder view (`ListingsPlaceholder.tsx`).
+- `components/` — Seller listings management view (`ListingsView.tsx`).
 - `pages/` — Route composition page (`ListingsPage.tsx`).

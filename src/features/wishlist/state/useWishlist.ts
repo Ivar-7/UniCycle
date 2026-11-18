@@ -1,118 +1,72 @@
-import { useCallback, useEffect, useState } from 'react';
-import { createStudentOrder } from '@/features/orders/api/orders.api';
-import { useAsyncState, type AsyncStatus } from '@/shared/hooks/useAsyncState';
-import { addWishlistEntry, fetchWishlistEntries, removeWishlistEntry } from '../api/wishlist.api';
-import type { WishlistEntry } from '../api/wishlist.types';
+import { useCallback, useState } from 'react';
+import { reservePickupOrder } from '@/features/orders/api/orders.api';
+import { getUserErrorMessage, logDiagnosticError } from '@/shared/errors';
+import { useAuth } from '@/shared/hooks/useAuth';
+import { useSavedItems } from '@/shared/hooks/useSavedItems';
+
+export type CheckoutResult = 'ok' | 'auth-required' | 'error';
 
 export function useWishlist() {
-  const { state, setLoading, setEmpty, setSuccess, setError } = useAsyncState<WishlistEntry[]>(
-    [],
-    'loading',
-  );
+  const { user } = useAuth();
+  const { status, entries, error, removeItem, reload } = useSavedItems();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
-
-  const loadWishlist = useCallback(async () => {
-    setLoading();
-    try {
-      const entries = await fetchWishlistEntries();
-      if (entries.length === 0) {
-        setEmpty();
-      } else {
-        setSuccess(entries);
-      }
-    } catch (err: unknown) {
-      setError(err);
-    }
-  }, [setEmpty, setError, setLoading, setSuccess]);
-
-  useEffect(() => {
-    void loadWishlist();
-  }, [loadWishlist]);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const handleRemoveEntry = useCallback(
-    async (id: string) => {
+    async (id: string, listingId: string) => {
+      setActionError(null);
       try {
-        await removeWishlistEntry(id);
-        const remaining = (state.data ?? []).filter((e) => e.id !== id);
-        if (remaining.length === 0) {
-          setEmpty();
-        } else {
-          setSuccess(remaining);
-        }
+        await removeItem(id, listingId);
       } catch (err: unknown) {
-        setError(err);
+        logDiagnosticError(err, 'useWishlist:handleRemoveEntry');
+        setActionError(getUserErrorMessage(err));
       }
     },
-    [setEmpty, setError, setSuccess, state.data],
+    [removeItem],
   );
 
-  const handleAddEntry = useCallback(
-    async (entry: WishlistEntry) => {
-      try {
-        const saved = await addWishlistEntry(entry);
-        const current = state.data ?? [];
-        setSuccess([saved, ...current.filter((e) => e.id !== saved.id)]);
-      } catch (err: unknown) {
-        setError(err);
-      }
-    },
-    [setError, setSuccess, state.data],
-  );
-
-  const handleCheckoutAll = useCallback(async (): Promise<boolean> => {
-    const items = state.data ?? [];
-    if (items.length === 0) {
-      return false;
+  const handleCheckoutAll = useCallback(async (): Promise<CheckoutResult> => {
+    if (!user) {
+      return 'auth-required';
     }
+    if (entries.length === 0) {
+      return 'error';
+    }
+
+    setActionError(null);
     setIsCheckingOut(true);
     try {
-      for (const item of items) {
-        await createStudentOrder({
-          id: `ord-${Date.now().toString().slice(-4)}-${item.id.slice(-2)}`,
+      for (const item of entries) {
+        await reservePickupOrder({
+          buyerId: user.uid,
+          ...(item.sellerId ? { sellerId: item.sellerId } : {}),
           itemTitle: item.title,
           totalAmount: item.price,
-          sellerName: 'Verified Campus Seller',
+          sellerName: item.sellerName ?? 'Verified Campus Seller',
           meetupSpot: item.campusLocation,
-          status: 'scheduled-pickup',
-          pickupCode: `UC-${Math.floor(1000 + Math.random() * 9000)}`,
-          orderedAt: new Date().toISOString(),
         });
-        await removeWishlistEntry(item.id);
+        await removeItem(item.id, item.listingId);
       }
-      setEmpty();
       setIsCheckingOut(false);
-      return true;
+      return 'ok';
     } catch (err: unknown) {
+      logDiagnosticError(err, 'useWishlist:handleCheckoutAll');
+      setActionError(getUserErrorMessage(err));
       setIsCheckingOut(false);
-      setError(err);
-      return false;
+      return 'error';
     }
-  }, [setEmpty, setError, state.data]);
-
-  const simulateStatus = useCallback(
-    (status: AsyncStatus) => {
-      if (status === 'loading') {
-        setLoading();
-      } else if (status === 'empty') {
-        setEmpty();
-      } else if (status === 'error') {
-        setError(new Error('Simulated wishlist error'));
-      } else {
-        void loadWishlist();
-      }
-    },
-    [loadWishlist, setEmpty, setError, setLoading],
-  );
+  }, [entries, removeItem, user]);
 
   return {
-    status: state.status,
-    entries: state.data ?? [],
-    error: state.error,
+    user,
+    status,
+    entries,
+    error,
+    actionError,
+    setActionError,
     isCheckingOut,
     handleRemoveEntry,
-    handleAddEntry,
     handleCheckoutAll,
-    reload: loadWishlist,
-    simulateStatus,
+    reload,
   };
 }

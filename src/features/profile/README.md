@@ -6,5 +6,5 @@ Displays a student's verified university profile, accommodation hall, seller rep
 ## Structure
 - `api/` — Types, Zod schemas, query keys, and profile API methods (`profile.api.ts`, `profile.keys.ts`, `profile.schema.ts`, `profile.types.ts`).
 - `state/` — Hook for student profile state (`useProfile.ts`).
-- `components/` — Student profile & sustainability impact placeholder (`ProfilePlaceholder.tsx`).
+- `components/` — Student profile & sustainability impact view (`ProfileView.tsx`).
 - `pages/` — Route composition page (`ProfilePage.tsx`).

@@ -1,4 +1,4 @@
-import { Bell, Check, Database, Globe, MapPin, Moon, RotateCcw, Shield, Sun } from 'lucide-react';
+import { Bell, Check, Globe, MapPin, Moon, RotateCcw, Shield, Sun } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useTheme } from '@/shared/hooks/useTheme';
 import { Badge, Button, Card, EmptyState, ErrorState, LoadingState } from '@/shared/ui';
@@ -9,18 +9,19 @@ import { useSettings } from '../state/useSettings';
 export function SettingsView() {
   const { theme, setTheme } = useTheme();
   const {
+    user,
     status,
     settings,
     error,
     actionError,
     savedBanner,
     updateSetting,
-    resetSeedData,
+    resetLocalCache,
     reload,
   } = useSettings();
 
   if (status === 'loading') {
-    return <LoadingState label="Loading account settings..." />;
+    return <LoadingState label="Loading preferences..." />;
   }
 
   if (status === 'error' && error) {
@@ -39,36 +40,38 @@ export function SettingsView() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-10 pb-16">
-      {/* Header */}
+    <div className="w-full space-y-10 pb-16">
       <div className="flex flex-col justify-between gap-4 border-b border-zinc-200 pb-6 sm:flex-row sm:items-end dark:border-zinc-800">
         <div className="space-y-2">
           <span className="text-xs font-medium uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
             Preferences
           </span>
-          <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-            Account & Studio Settings
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">
+            Account & Display Settings
           </h1>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Configure your appearance theme, default residence hall pickup location, and campus
-            notifications.
+            Configure your appearance theme, currency, default residence hall pickup point, and
+            campus alerts.
           </p>
         </div>
         {savedBanner ? (
-          <Badge tone="emerald">
+          <Badge tone="neutral">
             <Check className="h-3.5 w-3.5" />
-            Synced with Firebase
+            {user ? 'Preferences Saved' : 'Saved on This Device'}
           </Badge>
         ) : null}
       </div>
 
       {actionError ? (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-medium text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
+        <div
+          role="alert"
+          className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-medium text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300"
+        >
           {actionError}
         </div>
       ) : null}
 
-      {/* Appearance Section: Light (Default) vs Dark Studio */}
+      {/* Appearance Section */}
       <motion.section
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -79,8 +82,7 @@ export function SettingsView() {
             Appearance & Theme
           </h2>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Light theme is the default editorial view. Switch between Light and Dark studio modes at
-            any time.
+            Switch between Light Gallery and Dark Studio modes at any time.
           </p>
         </div>
 
@@ -91,16 +93,16 @@ export function SettingsView() {
             className={cn(
               'flex flex-col gap-4 rounded-2xl border p-5 text-left transition-all',
               theme === 'light'
-                ? 'border-zinc-900 bg-white ring-2 ring-zinc-900 dark:border-zinc-100 dark:bg-zinc-900 dark:ring-zinc-100'
+                ? 'border-zinc-400 bg-white ring-2 ring-zinc-400 dark:border-zinc-500 dark:bg-zinc-900 dark:ring-zinc-500'
                 : 'border-zinc-200 bg-white/60 hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/50',
             )}
           >
             <div className="flex items-center justify-between">
               <span className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                 <Sun className="h-4 w-4 text-amber-500" />
-                Light Gallery (Default)
+                Light Gallery
               </span>
-              {theme === 'light' ? <Badge tone="emerald">Active</Badge> : null}
+              {theme === 'light' ? <Badge tone="neutral">Active</Badge> : null}
             </div>
             <div className="h-20 rounded-xl border border-stone-200 bg-stone-100 p-3">
               <div className="h-3 w-24 rounded-sm bg-zinc-800" />
@@ -118,16 +120,16 @@ export function SettingsView() {
             className={cn(
               'flex flex-col gap-4 rounded-2xl border p-5 text-left transition-all',
               theme === 'dark'
-                ? 'border-zinc-900 bg-white ring-2 ring-zinc-900 dark:border-zinc-100 dark:bg-zinc-900 dark:ring-zinc-100'
+                ? 'border-zinc-400 bg-white ring-2 ring-zinc-400 dark:border-zinc-500 dark:bg-zinc-900 dark:ring-zinc-500'
                 : 'border-zinc-200 bg-white/60 hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/50',
             )}
           >
             <div className="flex items-center justify-between">
               <span className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                 <Moon className="h-4 w-4 text-indigo-400" />
-                Dark Studio Spotlight
+                Dark Studio
               </span>
-              {theme === 'dark' ? <Badge tone="emerald">Active</Badge> : null}
+              {theme === 'dark' ? <Badge tone="neutral">Active</Badge> : null}
             </div>
             <div className="h-20 rounded-xl border border-zinc-800 bg-zinc-950 p-3">
               <div className="h-3 w-24 rounded-sm bg-zinc-100" />
@@ -243,14 +245,14 @@ export function SettingsView() {
                     onClick={() => void updateSetting(item.key, !enabled)}
                     className={cn(
                       'relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors',
-                      enabled ? 'bg-zinc-900 dark:bg-zinc-100' : 'bg-zinc-300 dark:bg-zinc-800',
+                      enabled ? 'bg-zinc-600 dark:bg-zinc-500' : 'bg-zinc-300 dark:bg-zinc-800',
                     )}
                   >
                     <span
                       className={cn(
                         'inline-block h-3.5 w-3.5 rounded-full transition-transform',
                         enabled
-                          ? 'translate-x-4 bg-white dark:bg-zinc-950'
+                          ? 'translate-x-4 bg-white dark:bg-zinc-100'
                           : 'translate-x-0.5 bg-white dark:bg-zinc-400',
                       )}
                     />
@@ -299,14 +301,14 @@ export function SettingsView() {
                     onClick={() => void updateSetting(item.key, !enabled)}
                     className={cn(
                       'relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors',
-                      enabled ? 'bg-zinc-900 dark:bg-zinc-100' : 'bg-zinc-300 dark:bg-zinc-800',
+                      enabled ? 'bg-zinc-600 dark:bg-zinc-500' : 'bg-zinc-300 dark:bg-zinc-800',
                     )}
                   >
                     <span
                       className={cn(
                         'inline-block h-3.5 w-3.5 rounded-full transition-transform',
                         enabled
-                          ? 'translate-x-4 bg-white dark:bg-zinc-950'
+                          ? 'translate-x-4 bg-white dark:bg-zinc-100'
                           : 'translate-x-0.5 bg-white dark:bg-zinc-400',
                       )}
                     />
@@ -318,21 +320,19 @@ export function SettingsView() {
         </Card>
       </div>
 
-      {/* Firebase Seed Data Management */}
+      {/* Local Cache Refresh */}
       <Card className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-            <Database className="h-4 w-4 text-zinc-500" />
-            Firebase & Seed Data Synchronization
-          </div>
+          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+            Refresh Local Catalogue Cache
+          </p>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Reset local seed cache and re-synchronize initial campus marketplace data with Cloud
-            Firestore.
+            Clear locally cached catalogue items and fetch fresh campus listings.
           </p>
         </div>
-        <Button type="button" variant="secondary" onClick={() => void resetSeedData()}>
+        <Button type="button" variant="outline" onClick={() => void resetLocalCache()}>
           <RotateCcw className="h-3.5 w-3.5" />
-          Reset & Re-seed Data
+          Clear Cache
         </Button>
       </Card>
     </div>

@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const marketplaceProductSchema = z.object({
   id: z.string().min(1),
+  sellerId: z.string().min(1).optional(),
   name: z.string().min(2),
   category: z.enum(['tech', 'bags', 'apparel', 'outdoor', 'furniture', 'kitchenware']),
   colour: z.enum(['black', 'white', 'sand', 'olive', 'navy']),
@@ -14,7 +15,6 @@ export const marketplaceProductSchema = z.object({
   campusHall: z.string().min(1),
   sellerName: z.string().min(1),
   condition: z.enum(['Like new', 'Good', 'Mint']),
-  showcaseId: z.string().min(1),
 });
 
 export const marketplaceProductListSchema = z.array(marketplaceProductSchema);

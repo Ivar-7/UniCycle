@@ -7,6 +7,7 @@ export interface ChatMessageItem {
 
 export interface ConversationThread {
   readonly id: string;
+  readonly participantIds: readonly string[];
   readonly peerStudentName: string;
   readonly itemTitle: string;
   readonly lastMessage: string;

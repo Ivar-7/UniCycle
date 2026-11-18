@@ -2,6 +2,8 @@ export type OrderExchangeStatus = 'scheduled-pickup' | 'completed' | 'cancelled'
 
 export interface StudentOrder {
   readonly id: string;
+  readonly buyerId: string;
+  readonly sellerId?: string;
   readonly itemTitle: string;
   readonly totalAmount: number;
   readonly sellerName: string;

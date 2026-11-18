@@ -2,7 +2,7 @@ import { fetchDocumentWithSeed } from '@/shared/firebase';
 import { aboutOverviewSchema } from './about.schema';
 import type { AboutOverviewData } from './about.types';
 
-export const SEED_ABOUT_DATA: AboutOverviewData = {
+const SEED_ABOUT_DATA: AboutOverviewData = {
   metrics: [
     {
       id: 'waste',
@@ -38,9 +38,9 @@ export const SEED_ABOUT_DATA: AboutOverviewData = {
     },
     {
       id: 'faq-3',
-      question: 'How does the 3D Product Studio work?',
+      question: 'How does the interactive item viewer work?',
       answer:
-        'Our lightweight 3D inspection studio lets you tilt, zoom, and inspect colourways and condition details at 60fps without slowing down your browser or mobile connection.',
+        'Rotate, zoom, and switch colourways directly on our product stage to inspect condition, materials, and details before arranging a campus pickup.',
     },
     {
       id: 'faq-4',

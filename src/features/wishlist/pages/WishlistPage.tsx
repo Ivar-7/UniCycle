@@ -1,5 +1,5 @@
-import { WishlistPlaceholder } from '../components/WishlistPlaceholder';
+import { WishlistView } from '../components/WishlistView';
 
 export default function WishlistPage() {
-  return <WishlistPlaceholder />;
+  return <WishlistView />;
 }

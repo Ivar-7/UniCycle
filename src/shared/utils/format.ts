@@ -1,8 +1,16 @@
-export function formatCurrency(amount: number, currency = 'GBP'): string {
-  return new Intl.NumberFormat('en-GB', {
+export type SupportedCurrency = 'USD' | 'GBP' | 'EUR';
+
+const CURRENCY_LOCALE_MAP: Record<SupportedCurrency, string> = {
+  USD: 'en-US',
+  GBP: 'en-GB',
+  EUR: 'en-IE',
+};
+
+export function formatCurrency(amount: number, currency: SupportedCurrency = 'USD'): string {
+  return new Intl.NumberFormat(CURRENCY_LOCALE_MAP[currency], {
     style: 'currency',
     currency,
-    maximumFractionDigits: 2,
+    maximumFractionDigits: amount % 1 === 0 ? 0 : 2,
   }).format(amount);
 }
 

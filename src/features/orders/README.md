@@ -6,5 +6,5 @@ Tracks student purchases, campus handover schedules, and completed pre-owned hou
 ## Structure
 - `api/` — Types, Zod schemas, query keys, and order API methods (`orders.api.ts`, `orders.keys.ts`, `orders.schema.ts`, `orders.types.ts`).
 - `state/` — Hook for order history and state transitions (`useOrders.ts`).
-- `components/` — Orders & campus exchanges placeholder view (`OrdersPlaceholder.tsx`).
+- `components/` — Orders & campus exchanges view (`OrdersView.tsx`).
 - `pages/` — Route composition page (`OrdersPage.tsx`).

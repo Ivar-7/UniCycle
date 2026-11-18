@@ -1,5 +1,5 @@
-import { ProfilePlaceholder } from '../components/ProfilePlaceholder';
+import { ProfileView } from '../components/ProfileView';
 
 export default function ProfilePage() {
-  return <ProfilePlaceholder />;
+  return <ProfileView />;
 }

@@ -12,7 +12,5 @@ export interface AuthSessionSummary {
   readonly uid: string;
   readonly email: string;
   readonly fullName: string;
-  readonly residenceHall: string;
   readonly verifiedCampusDomain: boolean;
-  readonly authProvider: 'firebase' | 'campus-seed';
 }

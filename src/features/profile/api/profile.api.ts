@@ -1,64 +1,57 @@
+import type { User } from 'firebase/auth';
 import {
-  fetchDocumentWithSeed,
-  firebaseAuth,
+  fetchUserDocument,
   uploadImageToFirebaseStorage,
-  upsertSingleDocument,
+  upsertUserDocument,
 } from '@/shared/firebase';
+import { isCampusEmail, resolveDisplayName } from '@/shared/utils/user';
 import { studentProfileSchema, updateProfileInputSchema } from './profile.schema';
 import type { StudentProfile, UpdateProfileInput } from './profile.types';
 
-export const SEED_PROFILE: StudentProfile = {
-  id: 'stu-001',
-  fullName: 'Alex Rivera',
-  universityEmail: 'a.rivera@university.ac.uk',
-  universityName: 'Central Tech University',
-  residenceHall: 'North Hall Residence, Block B',
-  isVerifiedStudent: true,
-  itemsReusedCount: 14,
-  wasteDivertedKg: 38.5,
-  rating: 4.9,
-};
+export async function fetchStudentProfile(user: User): Promise<StudentProfile> {
+  const existing = await fetchUserDocument('users', user.uid, studentProfileSchema);
+  if (existing) {
+    return existing;
+  }
 
-function getActiveProfileDocId(): string {
-  return firebaseAuth.currentUser?.uid ?? SEED_PROFILE.id;
-}
+  const email = user.email ?? 'student@university.edu';
+  const initialProfile: StudentProfile = {
+    id: user.uid,
+    fullName: resolveDisplayName({ displayName: user.displayName, email }, 'Campus Student'),
+    universityEmail: email,
+    universityName: 'Verified Campus Member',
+    residenceHall: 'North Hall Residence, Block B',
+    isVerifiedStudent: isCampusEmail(email),
+    itemsReusedCount: 0,
+    wasteDivertedKg: 0,
+    rating: 5.0,
+    ...(user.photoURL ? { avatarUrl: user.photoURL } : {}),
+  };
 
-export async function fetchStudentProfile(): Promise<StudentProfile> {
-  const docId = getActiveProfileDocId();
-  const currentUser = firebaseAuth.currentUser;
-  const seedForUser: StudentProfile = currentUser
-    ? {
-        ...SEED_PROFILE,
-        id: currentUser.uid,
-        fullName: currentUser.displayName ?? SEED_PROFILE.fullName,
-        universityEmail: currentUser.email ?? SEED_PROFILE.universityEmail,
-      }
-    : SEED_PROFILE;
-
-  return fetchDocumentWithSeed('users', docId, studentProfileSchema, seedForUser);
+  return upsertUserDocument('users', user.uid, initialProfile, studentProfileSchema);
 }
 
 export async function updateStudentProfile(
   current: StudentProfile,
+  userId: string,
   input: UpdateProfileInput,
   avatarFile?: File | null,
 ): Promise<StudentProfile> {
   const validated = updateProfileInputSchema.parse(input);
-  const docId = getActiveProfileDocId();
 
   let uploadedAvatarUrl = current.avatarUrl;
   if (avatarFile) {
-    const uploadResult = await uploadImageToFirebaseStorage('avatars', docId, avatarFile);
+    const uploadResult = await uploadImageToFirebaseStorage('avatars', userId, avatarFile);
     uploadedAvatarUrl = uploadResult.downloadUrl;
   }
 
   const updated: StudentProfile = {
     ...current,
-    id: docId,
+    id: userId,
     fullName: validated.fullName,
     residenceHall: validated.residenceHall,
     ...(uploadedAvatarUrl ? { avatarUrl: uploadedAvatarUrl } : {}),
   };
 
-  return upsertSingleDocument('users', docId, updated, studentProfileSchema);
+  return upsertUserDocument('users', userId, updated, studentProfileSchema);
 }

@@ -1,78 +1,97 @@
-import { useCallback, useState } from 'react';
-import { useAsyncState, type AsyncStatus } from '@/shared/hooks/useAsyncState';
+import { useCallback, useMemo, useState } from 'react';
+import { getUserErrorMessage } from '@/shared/errors';
+import { useAuth } from '@/shared/hooks/useAuth';
 import {
-  getInitialAuthSession,
+  buildSessionSummary,
   registerStudentWithFirebase,
-  SEED_AUTH_SESSION,
+  sendStudentPasswordReset,
   signInStudentWithFirebase,
   signOutStudentFromFirebase,
 } from '../api/auth.api';
-import type { AuthSessionSummary } from '../api/auth.types';
 
 export function useStudentAuth() {
-  const { state, setLoading, setEmpty, setSuccess, setError } = useAsyncState<AuthSessionSummary>(
-    getInitialAuthSession(),
-    'success',
-  );
-  const [universityEmail, setUniversityEmail] = useState<string>(SEED_AUTH_SESSION.email);
-  const [password, setPassword] = useState<string>('campuspass123');
-  const [fullName, setFullName] = useState<string>(SEED_AUTH_SESSION.fullName);
-  const [residenceHall, setResidenceHall] = useState<string>(SEED_AUTH_SESSION.residenceHall);
+  const { user, isLoading: authLoading } = useAuth();
+  const [universityEmail, setUniversityEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [fullName, setFullName] = useState<string>('');
+  const [residenceHall, setResidenceHall] = useState<string>('North Hall Residence, Block B');
 
-  const submitSignIn = useCallback(async () => {
-    setLoading();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
+
+  const session = useMemo(() => (user ? buildSessionSummary(user) : null), [user]);
+
+  const submitSignIn = useCallback(async (): Promise<boolean> => {
+    setIsSubmitting(true);
+    setFormError(null);
+    setResetMessage(null);
     try {
-      const session = await signInStudentWithFirebase({ universityEmail, password });
-      setSuccess(session);
+      await signInStudentWithFirebase({ universityEmail, password });
+      setPassword('');
+      setIsSubmitting(false);
+      return true;
     } catch (err: unknown) {
-      setError(err);
+      setFormError(getUserErrorMessage(err));
+      setIsSubmitting(false);
+      return false;
     }
-  }, [password, setError, setLoading, setSuccess, universityEmail]);
+  }, [password, universityEmail]);
 
-  const submitRegister = useCallback(async () => {
-    setLoading();
+  const submitRegister = useCallback(async (): Promise<boolean> => {
+    setIsSubmitting(true);
+    setFormError(null);
+    setResetMessage(null);
     try {
-      const session = await registerStudentWithFirebase({
+      await registerStudentWithFirebase({
         universityEmail,
         password,
         fullName,
         residenceHall,
       });
-      setSuccess(session);
+      setPassword('');
+      setIsSubmitting(false);
+      return true;
     } catch (err: unknown) {
-      setError(err);
+      setFormError(getUserErrorMessage(err));
+      setIsSubmitting(false);
+      return false;
     }
-  }, [fullName, password, residenceHall, setError, setLoading, setSuccess, universityEmail]);
+  }, [fullName, password, residenceHall, universityEmail]);
+
+  const submitPasswordReset = useCallback(async () => {
+    setIsSubmitting(true);
+    setFormError(null);
+    setResetMessage(null);
+    try {
+      await sendStudentPasswordReset(universityEmail);
+      setResetMessage('Password reset instructions sent to your university inbox.');
+    } catch (err: unknown) {
+      setFormError(getUserErrorMessage(err));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [universityEmail]);
 
   const signOutStudent = useCallback(async () => {
-    setLoading();
+    setIsSubmitting(true);
+    setFormError(null);
     try {
       await signOutStudentFromFirebase();
-      setEmpty();
     } catch (err: unknown) {
-      setError(err);
+      setFormError(getUserErrorMessage(err));
+    } finally {
+      setIsSubmitting(false);
     }
-  }, [setEmpty, setError, setLoading]);
-
-  const simulateStatus = useCallback(
-    (status: AsyncStatus) => {
-      if (status === 'loading') {
-        setLoading();
-      } else if (status === 'empty') {
-        setEmpty();
-      } else if (status === 'error') {
-        setError(new Error('Invalid university credentials'));
-      } else {
-        setSuccess(SEED_AUTH_SESSION);
-      }
-    },
-    [setEmpty, setError, setLoading, setSuccess],
-  );
+  }, []);
 
   return {
-    status: state.status,
-    session: state.data,
-    error: state.error,
+    authLoading,
+    session,
+    isSubmitting,
+    formError,
+    setFormError,
+    resetMessage,
     universityEmail,
     setUniversityEmail,
     password,
@@ -83,7 +102,7 @@ export function useStudentAuth() {
     setResidenceHall,
     submitSignIn,
     submitRegister,
+    submitPasswordReset,
     signOutStudent,
-    simulateStatus,
   };
 }

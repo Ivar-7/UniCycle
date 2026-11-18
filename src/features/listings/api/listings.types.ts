@@ -4,6 +4,7 @@ export type ListingStatus = 'active' | 'reserved' | 'sold';
 
 export interface SellerListing {
   readonly id: string;
+  readonly sellerId: string;
   readonly title: string;
   readonly category: ProductCategory;
   readonly price: number;
@@ -11,7 +12,7 @@ export interface SellerListing {
   readonly viewsCount: number;
   readonly pickupHall: string;
   readonly imageUrl: string;
-  readonly storageSource?: 'firebase-storage' | 'local-preview' | 'seed';
+  readonly storageSource?: 'firebase-storage' | 'seed';
   readonly updatedAt: string;
 }
 

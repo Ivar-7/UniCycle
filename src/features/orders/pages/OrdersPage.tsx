@@ -1,5 +1,5 @@
-import { OrdersPlaceholder } from '../components/OrdersPlaceholder';
+import { OrdersView } from '../components/OrdersView';
 
 export default function OrdersPage() {
-  return <OrdersPlaceholder />;
+  return <OrdersView />;
 }

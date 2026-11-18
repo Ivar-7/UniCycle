@@ -8,6 +8,7 @@ export type SortOptionValue = 'featured' | 'price-asc' | 'price-desc' | 'newest'
 
 export interface MarketplaceProduct {
   readonly id: string;
+  readonly sellerId?: string;
   readonly name: string;
   readonly category: ProductCategory;
   readonly colour: ProductColour;
@@ -20,7 +21,6 @@ export interface MarketplaceProduct {
   readonly campusHall: string;
   readonly sellerName: string;
   readonly condition: 'Like new' | 'Good' | 'Mint';
-  readonly showcaseId: string;
 }
 
 export interface MarketplaceFilters {

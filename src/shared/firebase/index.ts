@@ -1,20 +1,13 @@
-export {
-  firebaseAnalytics,
-  firebaseApp,
-  firebaseAuth,
-  firebaseConfig,
-  firebaseStorage,
-  firestoreDb,
-  realtimeDb,
-} from './firebase.config';
-export { firebaseConfigSchema, type FirebaseConfig } from './firebase.schema';
+export { firebaseAuth, firebaseStorage, firestoreDb } from './firebase.config';
 export {
   clearLocalSeedCache,
+  deleteUserDocument,
   fetchCollectionWithSeed,
   fetchDocumentWithSeed,
-  removeCollectionDocument,
-  upsertCollectionDocument,
-  upsertSingleDocument,
+  fetchUserCollection,
+  fetchUserDocument,
+  upsertUserDocument,
+  type UserCollectionQueryOptions,
 } from './firebase.seed';
 export {
   imageUploadValidationSchema,

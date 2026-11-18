@@ -2,7 +2,6 @@ import { AlertCircle, Inbox, Loader2, RefreshCw } from 'lucide-react';
 import { motion } from 'motion/react';
 import type { ReactNode } from 'react';
 import type { AppError } from '@/shared/errors';
-import type { AsyncStatus } from '@/shared/hooks/useAsyncState';
 import { Button } from './Button';
 import { Card } from './Card';
 
@@ -19,8 +18,8 @@ export function LoadingState({ label = 'Loading student marketplace data...' }: 
       transition={{ duration: 0.2 }}
     >
       <Card className="flex flex-col items-center justify-center py-16 text-center">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-600 dark:text-emerald-400" />
-        <p className="mt-3 text-sm font-medium text-slate-600 dark:text-slate-400">{label}</p>
+        <Loader2 className="h-8 w-8 animate-spin text-zinc-600 dark:text-zinc-300" />
+        <p className="mt-3 text-sm font-medium text-zinc-600 dark:text-zinc-400">{label}</p>
       </Card>
     </motion.div>
   );
@@ -42,11 +41,11 @@ export function EmptyState({ title, description, actionLabel, onAction, icon }: 
       transition={{ duration: 0.25 }}
     >
       <Card className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
           {icon ?? <Inbox className="h-6 w-6" />}
         </div>
-        <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
-        <p className="mt-1 max-w-md text-sm text-slate-600 dark:text-slate-400">{description}</p>
+        <h3 className="mt-4 text-base font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
+        <p className="mt-1 max-w-md text-sm text-zinc-600 dark:text-zinc-400">{description}</p>
         {actionLabel && onAction ? (
           <div className="mt-5">
             <Button variant="primary" size="sm" onClick={onAction}>
@@ -75,10 +74,10 @@ export function ErrorState({ error, onRetry }: ErrorStateProps) {
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 text-rose-600 dark:bg-rose-950 dark:text-rose-400">
           <AlertCircle className="h-6 w-6" />
         </div>
-        <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-slate-100">
+        <h3 className="mt-4 text-base font-semibold text-zinc-900 dark:text-zinc-100">
           Unable to load section
         </h3>
-        <p className="mt-1 max-w-md text-sm text-slate-600 dark:text-slate-400">
+        <p className="mt-1 max-w-md text-sm text-zinc-600 dark:text-zinc-400">
           {error.userMessage}
         </p>
         {onRetry ? (
@@ -91,37 +90,5 @@ export function ErrorState({ error, onRetry }: ErrorStateProps) {
         ) : null}
       </Card>
     </motion.div>
-  );
-}
-
-export interface StateSimulatorBarProps {
-  readonly currentStatus: AsyncStatus;
-  readonly onSelectStatus: (status: AsyncStatus) => void;
-}
-
-const SIMULATOR_OPTIONS: readonly AsyncStatus[] = ['success', 'loading', 'empty', 'error'];
-
-export function StateSimulatorBar({ currentStatus, onSelectStatus }: StateSimulatorBarProps) {
-  return (
-    <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-100/80 px-3 py-1.5 text-xs dark:border-slate-800 dark:bg-slate-900/80">
-      <span className="font-medium text-slate-500 dark:text-slate-400">Preview State:</span>
-      {SIMULATOR_OPTIONS.map((status) => {
-        const isActive = currentStatus === status;
-        return (
-          <button
-            key={status}
-            type="button"
-            onClick={() => onSelectStatus(status)}
-            className={
-              isActive
-                ? 'rounded-lg bg-emerald-600 px-2.5 py-1 font-medium capitalize text-white shadow-2xs'
-                : 'rounded-lg px-2.5 py-1 font-medium capitalize text-slate-600 hover:bg-slate-200/70 dark:text-slate-300 dark:hover:bg-slate-800'
-            }
-          >
-            {status}
-          </button>
-        );
-      })}
-    </div>
   );
 }

@@ -9,14 +9,13 @@ const USER_MESSAGES: Record<ErrorCode, string> = {
   AUTH_WEAK_PASSWORD: 'Please choose a stronger password with at least 8 characters.',
   AUTH_FORBIDDEN: 'You do not have permission to modify this campus resource.',
   STORAGE_UPLOAD_FAILED:
-    'Unable to upload your image to Firebase Storage. Please check your connection or try a smaller image.',
+    'Unable to upload your image right now. Please check your connection or try a smaller image.',
   STORAGE_INVALID_FILE: 'Please select a valid JPEG, PNG, or WebP image under 5 MB.',
   NETWORK_OFFLINE:
-    'Unable to reach Firebase. Please check your campus Wi-Fi or network connection.',
-  RESOURCE_NOT_FOUND: 'The requested marketplace listing or document could not be found.',
+    'Unable to reach UniCycle services. Please check your campus Wi-Fi or network connection.',
+  RESOURCE_NOT_FOUND: 'The requested marketplace listing or item could not be found.',
   VALIDATION_FAILED: 'Some of the information provided is invalid. Please review and try again.',
-  FIREBASE_ERROR:
-    'A service error occurred while syncing with UniCycle Firebase. Please try again.',
+  FIREBASE_ERROR: 'A service error occurred while syncing your campus data. Please try again.',
   UNKNOWN_ERROR: 'Something went wrong on our end. Please refresh or try again in a moment.',
 };
 
@@ -53,7 +52,11 @@ export function resolveErrorCode(error: unknown): ErrorCode {
     if (rawCode.includes('not-found')) {
       return 'RESOURCE_NOT_FOUND';
     }
-    if (rawCode.includes('network') || rawCode.includes('unavailable')) {
+    if (
+      rawCode.includes('network') ||
+      rawCode.includes('unavailable') ||
+      rawCode.includes('too-many-requests')
+    ) {
       return 'NETWORK_OFFLINE';
     }
     if (

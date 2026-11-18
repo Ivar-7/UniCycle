@@ -1,11 +1,12 @@
 import {
+  ArrowRight,
   Award,
-  Box,
   Camera,
   Check,
   Edit3,
   GraduationCap,
   Leaf,
+  LogIn,
   MapPin,
   Package,
   Settings,
@@ -14,17 +15,9 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import {
-  Badge,
-  Button,
-  Card,
-  EmptyState,
-  ErrorState,
-  LoadingState,
-  StarRating,
-  StudioCutoutSvg,
-} from '@/shared/ui';
+import { Link, useNavigate } from 'react-router-dom';
+import { usePreferences } from '@/shared/hooks/usePreferences';
+import { Badge, Button, Card, EmptyState, ErrorState, LoadingState, StarRating } from '@/shared/ui';
 import { useProfile } from '../state/useProfile';
 
 const STUDENT_REVIEWS = [
@@ -41,21 +34,48 @@ const STUDENT_REVIEWS = [
     reviewer: 'Maya · 2nd Year CS',
     item: 'Stagg Pour-Over Kettle',
     rating: 5,
-    comment: 'Spotless condition, heats up in 90 seconds. Saved me $60 compared to retail.',
+    comment: 'Spotless condition, heats up cleanly. Saved me plenty compared to retail.',
     date: '1 week ago',
   },
 ] as const;
 
-export function ProfilePlaceholder() {
-  const { status, profile, error, isSaving, saveError, saveSuccess, saveProfile, reload } =
-    useProfile();
+export function ProfileView() {
+  const navigate = useNavigate();
+  const { formatPrice } = usePreferences();
+  const {
+    user,
+    authLoading,
+    status,
+    profile,
+    error,
+    isSaving,
+    saveError,
+    saveSuccess,
+    saveProfile,
+    reload,
+  } = useProfile();
+
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [fullNameDraft, setFullNameDraft] = useState<string>('');
   const [hallDraft, setHallDraft] = useState<string>('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
-  if (status === 'loading') {
+  if (authLoading || (user && status === 'loading')) {
     return <LoadingState label="Loading your student profile..." />;
+  }
+
+  if (!authLoading && !user) {
+    return (
+      <div className="pb-16">
+        <EmptyState
+          icon={<LogIn className="h-6 w-6" />}
+          title="Sign in to view your student profile"
+          description="Verify your university email to manage your residence hall pickup details and circular impact."
+          actionLabel="Student Sign In"
+          onAction={() => void navigate('/auth?redirect=/profile')}
+        />
+      </div>
+    );
   }
 
   if (status === 'error' && error) {
@@ -67,8 +87,8 @@ export function ProfilePlaceholder() {
       <EmptyState
         icon={<UserCircle className="h-6 w-6" />}
         title="No student profile configured"
-        description="Verify your university email to build trust on campus and track your reuse impact."
-        actionLabel="Load Student Profile"
+        description="Reload to set up your verified student profile."
+        actionLabel="Load Profile"
         onAction={() => void reload()}
       />
     );
@@ -76,6 +96,7 @@ export function ProfilePlaceholder() {
 
   const initials = profile.fullName
     .split(' ')
+    .filter(Boolean)
     .map((part) => part[0])
     .join('')
     .slice(0, 2)
@@ -90,14 +111,14 @@ export function ProfilePlaceholder() {
 
   return (
     <div className="space-y-10 pb-16">
-      {/* Top Editorial Profile Header */}
+      {/* Top Profile Header */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="overflow-hidden rounded-3xl border border-zinc-200 bg-stone-100/80 p-6 sm:p-10 dark:border-zinc-800 dark:bg-zinc-900/80"
+        className="overflow-hidden rounded-3xl border border-zinc-200 bg-stone-100/80 p-5 sm:p-8 lg:p-10 dark:border-zinc-800 dark:bg-zinc-900/80"
       >
         <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
             {profile.avatarUrl ? (
               <img
                 src={profile.avatarUrl}
@@ -105,69 +126,71 @@ export function ProfilePlaceholder() {
                 className="h-20 w-20 shrink-0 rounded-2xl object-cover ring-2 ring-zinc-900/10 dark:ring-white/15"
               />
             ) : (
-              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-zinc-900 text-2xl font-bold text-white dark:bg-zinc-100 dark:text-zinc-950">
-                {initials}
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border border-zinc-300 bg-zinc-200/80 text-2xl font-bold text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                {initials || 'UC'}
               </div>
             )}
-            <div className="space-y-2">
+            <div className="min-w-0 space-y-2">
               <div className="flex flex-wrap items-center gap-2.5">
                 <h1 className="text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">
                   {profile.fullName}
                 </h1>
                 {profile.isVerifiedStudent ? (
-                  <Badge tone="emerald">
+                  <Badge tone="neutral">
                     <ShieldCheck className="h-3.5 w-3.5" />
-                    Verified .ac.uk Student
+                    Verified Student
                   </Badge>
                 ) : null}
                 {saveSuccess ? (
-                  <Badge tone="emerald">
+                  <Badge tone="neutral">
                     <Check className="h-3.5 w-3.5" />
-                    Synced to Firestore
+                    Profile Saved
                   </Badge>
                 ) : null}
               </div>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">{profile.universityEmail}</p>
-              <div className="flex flex-wrap items-center gap-4 pt-1 text-xs text-zinc-600 dark:text-zinc-400">
+              <p className="truncate text-sm text-zinc-500 dark:text-zinc-400">
+                {profile.universityEmail}
+              </p>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-1 text-xs text-zinc-600 dark:text-zinc-400">
                 <span className="inline-flex items-center gap-1.5">
-                  <GraduationCap className="h-4 w-4 text-zinc-500" />
+                  <GraduationCap className="h-4 w-4 shrink-0 text-zinc-500" />
                   {profile.universityName}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4 text-zinc-500" />
+                  <MapPin className="h-4 w-4 shrink-0 text-zinc-500" />
                   {profile.residenceHall}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
             <button
               type="button"
               onClick={openEditor}
-              className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-xs font-semibold text-zinc-800 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-xs font-semibold text-zinc-800 transition-colors hover:bg-zinc-100 sm:w-auto dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
             >
               <Edit3 className="h-4 w-4" />
-              Edit Profile & Photo
+              Edit Profile
             </button>
             <Link
               to="/settings"
-              className="inline-flex items-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-xs font-semibold text-zinc-800 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-xs font-semibold text-zinc-800 transition-colors hover:bg-zinc-100 sm:flex-initial dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
             >
               <Settings className="h-4 w-4" />
               Preferences
             </Link>
             <Link
               to="/listings"
-              className="inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-zinc-200"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-zinc-200/80 px-4 py-2.5 text-xs font-semibold text-zinc-900 transition-colors hover:bg-zinc-300/80 sm:flex-initial dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
             >
               <Package className="h-4 w-4" />
-              Manage Listings
+              My Listings
             </Link>
           </div>
         </div>
 
-        {/* Inline Firestore + Firebase Storage Profile Editor */}
+        {/* Inline Profile Editor */}
         {isEditing ? (
           <form
             className="mt-6 space-y-4 border-t border-zinc-200/80 pt-6 dark:border-zinc-800"
@@ -188,12 +211,15 @@ export function ProfilePlaceholder() {
             }}
           >
             {saveError ? (
-              <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-medium text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
+              <div
+                role="alert"
+                className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-medium text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300"
+              >
                 {saveError}
               </div>
             ) : null}
 
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div className="space-y-1.5">
                 <label
                   htmlFor="profile-fullname"
@@ -228,12 +254,12 @@ export function ProfilePlaceholder() {
                 />
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 sm:col-span-2 lg:col-span-1">
                 <label
                   htmlFor="profile-avatar"
                   className="block text-xs font-medium text-zinc-700 dark:text-zinc-300"
                 >
-                  Avatar Photo (Firebase Storage)
+                  Profile Photo (under 2 MB)
                 </label>
                 <label
                   htmlFor="profile-avatar"
@@ -254,22 +280,22 @@ export function ProfilePlaceholder() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-2">
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <Button type="button" variant="ghost" onClick={() => setIsEditing(false)}>
                 Cancel
               </Button>
               <Button type="submit" variant="secondary" disabled={isSaving}>
-                {isSaving ? 'Saving to Firebase...' : 'Save Profile'}
+                {isSaving ? 'Saving...' : 'Save Profile'}
               </Button>
             </div>
           </form>
         ) : null}
       </motion.div>
 
-      {/* 3-Column Metrics & Studio Highlight */}
+      {/* Metrics & Interactive Spotlight */}
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="space-y-3">
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wider text-emerald-700 uppercase dark:text-emerald-400">
+          <div className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wider text-zinc-700 uppercase dark:text-zinc-300">
             <Leaf className="h-4 w-4" />
             Circular Impact
           </div>
@@ -277,7 +303,7 @@ export function ProfilePlaceholder() {
             {profile.wasteDivertedKg} kg
           </p>
           <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
-            Total dorm furniture, kitchenware, and tech diverted from landfill across{' '}
+            Dorm furniture, kitchenware, and tech diverted from landfill across{' '}
             {profile.itemsReusedCount} campus handovers.
           </p>
         </Card>
@@ -294,50 +320,60 @@ export function ProfilePlaceholder() {
             <StarRating value={profile.rating} size="sm" />
           </div>
           <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
-            100% punctual hall-to-hall pickups · Verified student seller since Autumn 2025.
+            Punctual hall-to-hall pickups · Verified student member.
           </p>
         </Card>
 
-        <Card className="flex flex-col justify-between bg-stone-900 text-stone-100 dark:bg-zinc-900">
-          <div className="flex items-center justify-between text-xs text-stone-400">
-            <span>Featured 3D Listing</span>
-            <Link to="/products?item=nordic-desk-lamp" className="text-amber-400 hover:underline">
-              Open 3D →
+        <Card className="flex flex-col justify-between gap-3">
+          <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
+            <span>Featured Listing</span>
+            <Link
+              to="/item/nordic-desk-lamp"
+              className="inline-flex items-center gap-1 font-medium text-zinc-900 hover:underline dark:text-zinc-100"
+            >
+              <span>View &amp; Buy</span>
+              <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
-          <div className="my-2 h-24 w-full">
-            <StudioCutoutSvg model="lamp" palette="sand" />
+          <div className="relative aspect-16/9 w-full overflow-hidden rounded-xl bg-stone-100 dark:bg-zinc-800">
+            <img
+              src="https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80"
+              alt="Nordic Architect Desk Lamp"
+              className="h-full w-full object-cover"
+            />
           </div>
           <div className="flex items-center justify-between text-xs">
-            <span className="font-medium text-white">Nordic Architect Desk Lamp</span>
-            <span className="font-bold text-amber-300">$48</span>
+            <span className="font-medium text-zinc-900 dark:text-zinc-100">
+              Nordic Architect Desk Lamp
+            </span>
+            <span className="font-bold text-zinc-900 dark:text-zinc-100">{formatPrice(48)}</span>
           </div>
         </Card>
       </div>
 
       {/* Student Feedback Section */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
             Recent Campus Buyer Reviews
           </h2>
           <Link
-            to="/products"
+            to="/"
             className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
           >
-            <Box className="h-3.5 w-3.5" />
-            View 3D Showcase
+            <span>Browse Shop</span>
+            <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           {STUDENT_REVIEWS.map((rev) => (
             <Card key={rev.id} className="space-y-3">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                   {rev.reviewer}
                 </span>
-                <span className="text-xs text-zinc-400">{rev.date}</span>
+                <span className="shrink-0 text-xs text-zinc-400">{rev.date}</span>
               </div>
               <div className="flex items-center gap-2">
                 <StarRating value={rev.rating} size="xs" />

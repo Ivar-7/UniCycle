@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react';
+import { usePreferences } from '@/shared/hooks/usePreferences';
 import { StarRating } from '@/shared/ui';
 import { cn } from '@/shared/utils/cn';
 import { CATEGORIES, COLOURS, PRICE_MAX, PRICE_MIN, RATINGS } from '../api/marketplace.api';
@@ -28,6 +29,8 @@ export function FilterSidebar({
   onToggleInStock,
   onSelectRating,
 }: FilterSidebarProps) {
+  const { formatPrice } = usePreferences();
+
   return (
     <div className="flex flex-col divide-y divide-zinc-200 dark:divide-zinc-800">
       {/* Category */}
@@ -57,7 +60,7 @@ export function FilterSidebar({
                 className={cn(
                   'flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border transition-colors',
                   checked
-                    ? 'border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-950'
+                    ? 'border-zinc-500 bg-zinc-600 text-white dark:border-zinc-400 dark:bg-zinc-400 dark:text-zinc-950'
                     : 'border-zinc-400 bg-transparent group-hover:border-zinc-600 dark:border-zinc-600 dark:group-hover:border-zinc-400',
                 )}
               >
@@ -86,13 +89,13 @@ export function FilterSidebar({
             value={filters.maxPrice}
             aria-label="Maximum price"
             onChange={(e) => onPriceChange(filters.minPrice, Number(e.target.value))}
-            className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-zinc-200 accent-zinc-900 dark:bg-zinc-800 dark:accent-zinc-100"
+            className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-zinc-200 accent-zinc-600 dark:bg-zinc-800 dark:accent-zinc-400"
           />
         </div>
         <div className="flex items-center justify-between text-sm tabular-nums text-zinc-800 dark:text-zinc-200">
-          <span>${filters.minPrice}</span>
+          <span>{formatPrice(filters.minPrice)}</span>
           <span>
-            ${filters.maxPrice}
+            {formatPrice(filters.maxPrice)}
             {filters.maxPrice === PRICE_MAX ? '+' : ''}
           </span>
         </div>
@@ -115,10 +118,10 @@ export function FilterSidebar({
                 title={colour.label}
                 onClick={() => onToggleColour(colour.value)}
                 className={cn(
-                  'h-7 w-7 rounded-full border border-zinc-300 transition-transform hover:scale-105 dark:border-zinc-700',
+                  'h-7 w-7 rounded-full border border-zinc-300 transition-transform hover:scale-105 dark:border-zinc-600',
                   colour.bgClass,
                   selected &&
-                    'ring-2 ring-zinc-900 ring-offset-2 ring-offset-white dark:ring-zinc-100 dark:ring-offset-zinc-950',
+                    'ring-2 ring-zinc-500 ring-offset-2 ring-offset-white dark:ring-zinc-400 dark:ring-offset-zinc-950',
                 )}
               />
             );
@@ -137,14 +140,14 @@ export function FilterSidebar({
           onClick={() => onToggleInStock(!filters.inStock)}
           className={cn(
             'relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border border-transparent transition-colors',
-            filters.inStock ? 'bg-zinc-900 dark:bg-zinc-100' : 'bg-zinc-300 dark:bg-zinc-800',
+            filters.inStock ? 'bg-zinc-600 dark:bg-zinc-500' : 'bg-zinc-300 dark:bg-zinc-800',
           )}
         >
           <span
             className={cn(
               'inline-block h-3.5 w-3.5 rounded-full transition-transform',
               filters.inStock
-                ? 'translate-x-4 bg-white dark:bg-zinc-950'
+                ? 'translate-x-4 bg-white dark:bg-zinc-100'
                 : 'translate-x-0.5 bg-white dark:bg-zinc-400',
             )}
           />
@@ -171,7 +174,7 @@ export function FilterSidebar({
                 className={cn(
                   'flex h-4 w-4 items-center justify-center rounded-full border transition-colors',
                   isSelected
-                    ? 'border-zinc-900 bg-zinc-900 dark:border-zinc-100 dark:bg-zinc-100'
+                    ? 'border-zinc-500 bg-zinc-600 dark:border-zinc-400 dark:bg-zinc-400'
                     : 'border-zinc-400 bg-transparent dark:border-zinc-600',
                 )}
               >

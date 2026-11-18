@@ -9,17 +9,16 @@ export const chatMessageItemSchema = z.object({
 
 export const conversationThreadSchema = z.object({
   id: z.string().min(1),
-  peerStudentName: z.string().min(1),
-  itemTitle: z.string().min(1),
-  lastMessage: z.string().min(1),
+  participantIds: z.array(z.string().min(1)).min(1).max(5),
+  peerStudentName: z.string().min(1).max(120),
+  itemTitle: z.string().min(1).max(160),
+  lastMessage: z.string().min(1).max(500),
   unreadCount: z.number().int().nonnegative(),
   updatedAt: z.string().min(1),
-  messages: z.array(chatMessageItemSchema),
+  messages: z.array(chatMessageItemSchema).max(200),
 });
 
 export const sendMessageInputSchema = z.object({
   threadId: z.string().min(1),
   text: z.string().trim().min(1, 'Message cannot be empty').max(500, 'Message is too long'),
 });
-
-export const conversationThreadListSchema = z.array(conversationThreadSchema);

@@ -6,5 +6,5 @@ Provides real-time messaging between student buyers and sellers to arrange safe 
 ## Structure
 - `api/` — Types, Zod schemas, query keys, and messaging API methods (`messages.api.ts`, `messages.keys.ts`, `messages.schema.ts`, `messages.types.ts`).
 - `state/` — Hook for student conversation threads (`useMessages.ts`).
-- `components/` — Campus inbox placeholder view (`MessagesPlaceholder.tsx`).
+- `components/` — Campus inbox messaging view (`MessagesView.tsx`).
 - `pages/` — Route composition page (`MessagesPage.tsx`).

@@ -4,42 +4,38 @@ import {
   doc,
   getDoc,
   getDocs,
+  orderBy,
+  query,
   setDoc,
-  writeBatch,
+  where,
 } from 'firebase/firestore';
 import type { z } from 'zod';
-import { logDiagnosticError } from '@/shared/errors';
+import { logDiagnosticError, normalizeError } from '@/shared/errors';
+import { readJsonStorage, writeJsonStorage } from '@/shared/utils/storage';
 import { firestoreDb } from './firebase.config';
 
-const LOCAL_SEED_CACHE_PREFIX = 'unicycle_firestore_seed_v2_';
+const LOCAL_CACHE_PREFIX = 'unicycle_cache_v4_';
 
 function readLocalCache<T>(key: string, schema: z.ZodType<T>): T | null {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-  try {
-    const raw = window.localStorage.getItem(`${LOCAL_SEED_CACHE_PREFIX}${key}`);
-    if (!raw) {
-      return null;
-    }
-    const parsedJson: unknown = JSON.parse(raw);
-    const validated = schema.safeParse(parsedJson);
-    return validated.success ? validated.data : null;
-  } catch (err: unknown) {
-    logDiagnosticError(err, `readLocalCache(${key})`);
-    return null;
-  }
+  return readJsonStorage(`${LOCAL_CACHE_PREFIX}${key}`, schema);
 }
 
-function writeLocalCache<T>(key: string, data: T): void {
-  if (typeof window === 'undefined') {
-    return;
+function writeLocalCache(key: string, data: unknown): void {
+  writeJsonStorage(`${LOCAL_CACHE_PREFIX}${key}`, data);
+}
+
+function parseSnapshotDocs<T>(
+  docs: readonly { readonly id: string; data(): object }[],
+  itemSchema: z.ZodType<T>,
+): T[] {
+  const results: T[] = [];
+  for (const docSnap of docs) {
+    const parsed = itemSchema.safeParse({ id: docSnap.id, ...docSnap.data() });
+    if (parsed.success) {
+      results.push(parsed.data);
+    }
   }
-  try {
-    window.localStorage.setItem(`${LOCAL_SEED_CACHE_PREFIX}${key}`, JSON.stringify(data));
-  } catch (err: unknown) {
-    logDiagnosticError(err, `writeLocalCache(${key})`);
-  }
+  return results;
 }
 
 export async function fetchCollectionWithSeed<T extends { readonly id: string }>(
@@ -55,45 +51,27 @@ export async function fetchCollectionWithSeed<T extends { readonly id: string }>
     const snapshot = await getDocs(colRef);
 
     if (!snapshot.empty) {
-      const validDocs: T[] = [];
-      for (const docSnap of snapshot.docs) {
-        const rawData: unknown = { id: docSnap.id, ...docSnap.data() };
-        const parsed = itemSchema.safeParse(rawData);
-        if (parsed.success) {
-          validDocs.push(parsed.data);
-        }
-      }
+      const validDocs = parseSnapshotDocs(snapshot.docs, itemSchema);
+
       if (validDocs.length > 0) {
-        writeLocalCache(collectionName, validDocs);
-        return validDocs;
+        // Merge user-published documents with curated baseline catalogue items
+        const byId = new Map<string, T>();
+        for (const base of validatedSeed) {
+          byId.set(base.id, base);
+        }
+        for (const remote of validDocs) {
+          byId.set(remote.id, remote);
+        }
+        const merged = Array.from(byId.values());
+        writeLocalCache(collectionName, merged);
+        return merged;
       }
     }
 
-    // Firestore collection is empty — seed it with initial seed data
-    const cached = readLocalCache(collectionName, listSchema);
-    const initialData = cached && cached.length > 0 ? cached : validatedSeed;
-    writeLocalCache(collectionName, initialData);
-
-    try {
-      const batch = writeBatch(firestoreDb);
-      for (const item of initialData) {
-        const docRef = doc(firestoreDb, collectionName, item.id);
-        batch.set(docRef, item);
-      }
-      await batch.commit();
-    } catch (seedErr: unknown) {
-      logDiagnosticError(seedErr, `FirestoreAutoSeed(${collectionName})`, 'FIREBASE_ERROR');
-    }
-
-    return initialData;
+    return readLocalCache(collectionName, listSchema) ?? validatedSeed;
   } catch (err: unknown) {
     logDiagnosticError(err, `fetchCollectionWithSeed(${collectionName})`, 'FIREBASE_ERROR');
-    const cached = readLocalCache(collectionName, listSchema);
-    if (cached && cached.length > 0) {
-      return cached;
-    }
-    writeLocalCache(collectionName, validatedSeed);
-    return validatedSeed;
+    return readLocalCache(collectionName, listSchema) ?? validatedSeed;
   }
 }
 
@@ -119,90 +97,85 @@ export async function fetchDocumentWithSeed<T extends object>(
       }
     }
 
-    const cached = readLocalCache(cacheKey, schema);
-    const initialDoc = cached ?? validatedSeed;
-    writeLocalCache(cacheKey, initialDoc);
-
-    try {
-      await setDoc(docRef, initialDoc);
-    } catch (seedErr: unknown) {
-      logDiagnosticError(seedErr, `FirestoreAutoSeedDoc(${collectionName}/${docId})`);
-    }
-
-    return initialDoc;
+    return readLocalCache(cacheKey, schema) ?? validatedSeed;
   } catch (err: unknown) {
     logDiagnosticError(err, `fetchDocumentWithSeed(${collectionName}/${docId})`, 'FIREBASE_ERROR');
-    const cached = readLocalCache(cacheKey, schema);
-    if (cached) {
-      return cached;
-    }
-    writeLocalCache(cacheKey, validatedSeed);
-    return validatedSeed;
+    return readLocalCache(cacheKey, schema) ?? validatedSeed;
   }
 }
 
-export async function upsertCollectionDocument<T extends { readonly id: string }>(
+export interface UserCollectionQueryOptions {
+  readonly filterField: string;
+  readonly filterOp: '==' | 'array-contains';
+  readonly userId: string;
+  readonly orderByField: string;
+}
+
+export async function fetchUserCollection<T extends { readonly id: string }>(
   collectionName: string,
-  item: T,
   itemSchema: z.ZodType<T>,
-  listSchema: z.ZodType<T[]>,
-  fallbackSeed: readonly T[],
-): Promise<T> {
-  const validatedItem = itemSchema.parse(item);
-  const currentList = readLocalCache(collectionName, listSchema) ?? [...fallbackSeed];
-  const exists = currentList.some((existing) => existing.id === validatedItem.id);
-  const updatedList = exists
-    ? currentList.map((existing) => (existing.id === validatedItem.id ? validatedItem : existing))
-    : [validatedItem, ...currentList];
-
-  writeLocalCache(collectionName, updatedList);
-
+  options: UserCollectionQueryOptions,
+): Promise<T[]> {
   try {
-    const docRef = doc(firestoreDb, collectionName, validatedItem.id);
-    await setDoc(docRef, validatedItem, { merge: true });
+    const colRef = collection(firestoreDb, collectionName);
+    const q = query(
+      colRef,
+      where(options.filterField, options.filterOp, options.userId),
+      orderBy(options.orderByField, 'desc'),
+    );
+    const snapshot = await getDocs(q);
+    return parseSnapshotDocs(snapshot.docs, itemSchema);
   } catch (err: unknown) {
-    logDiagnosticError(err, `upsertCollectionDocument(${collectionName}/${validatedItem.id})`);
-  }
-
-  return validatedItem;
-}
-
-export async function removeCollectionDocument<T extends { readonly id: string }>(
-  collectionName: string,
-  docId: string,
-  listSchema: z.ZodType<T[]>,
-  fallbackSeed: readonly T[],
-): Promise<void> {
-  const currentList = readLocalCache(collectionName, listSchema) ?? [...fallbackSeed];
-  const updatedList = currentList.filter((item) => item.id !== docId);
-  writeLocalCache(collectionName, updatedList);
-
-  try {
-    const docRef = doc(firestoreDb, collectionName, docId);
-    await deleteDoc(docRef);
-  } catch (err: unknown) {
-    logDiagnosticError(err, `removeCollectionDocument(${collectionName}/${docId})`);
+    logDiagnosticError(err, `fetchUserCollection(${collectionName})`, 'FIREBASE_ERROR');
+    throw normalizeError(err, 'FIREBASE_ERROR');
   }
 }
 
-export async function upsertSingleDocument<T extends object>(
+export async function upsertUserDocument<T extends object>(
   collectionName: string,
   docId: string,
   data: T,
   schema: z.ZodType<T>,
 ): Promise<T> {
   const validated = schema.parse(data);
-  const cacheKey = `${collectionName}_${docId}`;
-  writeLocalCache(cacheKey, validated);
-
   try {
     const docRef = doc(firestoreDb, collectionName, docId);
     await setDoc(docRef, validated, { merge: true });
+    return validated;
   } catch (err: unknown) {
-    logDiagnosticError(err, `upsertSingleDocument(${collectionName}/${docId})`);
+    logDiagnosticError(err, `upsertUserDocument(${collectionName}/${docId})`, 'FIREBASE_ERROR');
+    throw normalizeError(err, 'FIREBASE_ERROR');
   }
+}
 
-  return validated;
+export async function fetchUserDocument<T extends object>(
+  collectionName: string,
+  docId: string,
+  schema: z.ZodType<T>,
+): Promise<T | null> {
+  try {
+    const docRef = doc(firestoreDb, collectionName, docId);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      return null;
+    }
+    const rawData: unknown = { id: docSnap.id, ...docSnap.data() };
+    const parsed = schema.safeParse(rawData);
+    return parsed.success ? parsed.data : null;
+  } catch (err: unknown) {
+    logDiagnosticError(err, `fetchUserDocument(${collectionName}/${docId})`, 'FIREBASE_ERROR');
+    throw normalizeError(err, 'FIREBASE_ERROR');
+  }
+}
+
+export async function deleteUserDocument(collectionName: string, docId: string): Promise<void> {
+  try {
+    const docRef = doc(firestoreDb, collectionName, docId);
+    await deleteDoc(docRef);
+  } catch (err: unknown) {
+    logDiagnosticError(err, `deleteUserDocument(${collectionName}/${docId})`, 'FIREBASE_ERROR');
+    throw normalizeError(err, 'FIREBASE_ERROR');
+  }
 }
 
 export function clearLocalSeedCache(): void {
@@ -212,7 +185,7 @@ export function clearLocalSeedCache(): void {
   const keysToRemove: string[] = [];
   for (let i = 0; i < window.localStorage.length; i += 1) {
     const k = window.localStorage.key(i);
-    if (k && k.startsWith(LOCAL_SEED_CACHE_PREFIX)) {
+    if (k && (k.startsWith(LOCAL_CACHE_PREFIX) || k.startsWith('unicycle_firestore_seed_v2_'))) {
       keysToRemove.push(k);
     }
   }

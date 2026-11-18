@@ -1,4 +1,4 @@
-import { fetchCollectionWithSeed, upsertCollectionDocument } from '@/shared/firebase';
+import { deleteUserDocument, fetchCollectionWithSeed, upsertUserDocument } from '@/shared/firebase';
 import { marketplaceProductListSchema, marketplaceProductSchema } from './marketplace.schema';
 import type {
   MarketplaceProduct,
@@ -27,7 +27,7 @@ export const COLOURS: readonly {
 }[] = [
   { value: 'black', label: 'Black', bgClass: 'bg-zinc-900' },
   { value: 'white', label: 'White', bgClass: 'bg-stone-100' },
-  { value: 'sand', label: 'Sand', bgClass: 'bg-amber-200' },
+  { value: 'sand', label: 'Sand', bgClass: 'bg-stone-300' },
   { value: 'olive', label: 'Olive', bgClass: 'bg-lime-800' },
   { value: 'navy', label: 'Navy', bgClass: 'bg-indigo-950' },
 ];
@@ -65,13 +65,12 @@ export const CATALOGUE_PRODUCTS: readonly MarketplaceProduct[] = [
     campusHall: 'North Hall Residence',
     sellerName: 'Maya · 2nd Year CS',
     condition: 'Mint',
-    showcaseId: 'atlas-headphones',
   },
   {
     id: 'carryall-pack',
     name: 'Carryall Day Pack',
     category: 'bags',
-    colour: 'olive',
+    colour: 'navy',
     price: 96,
     rating: 4.7,
     reviews: 566,
@@ -82,7 +81,6 @@ export const CATALOGUE_PRODUCTS: readonly MarketplaceProduct[] = [
     campusHall: 'Oakwood Village',
     sellerName: 'Liam · Final Year Bio',
     condition: 'Like new',
-    showcaseId: 'carryall-pack',
   },
   {
     id: 'meridian-watch',
@@ -99,7 +97,6 @@ export const CATALOGUE_PRODUCTS: readonly MarketplaceProduct[] = [
     campusHall: 'Central Union',
     sellerName: 'Noah · 3rd Year Econ',
     condition: 'Mint',
-    showcaseId: 'meridian-watch',
   },
   {
     id: 'volt-runners',
@@ -111,12 +108,10 @@ export const CATALOGUE_PRODUCTS: readonly MarketplaceProduct[] = [
     reviews: 942,
     inStock: true,
     added: '2026-10-30',
-    image:
-      'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80',
+    image: '/images/hero/cloud-front.webp',
     campusHall: 'Eastgate Courts',
     sellerName: 'Elena · Postgrad Design',
     condition: 'Mint',
-    showcaseId: 'kestrel-vapor-pace-3',
   },
   {
     id: 'horizon-sunglasses',
@@ -133,7 +128,6 @@ export const CATALOGUE_PRODUCTS: readonly MarketplaceProduct[] = [
     campusHall: 'Riverside Flats',
     sellerName: 'Sam · 2nd Year Media',
     condition: 'Like new',
-    showcaseId: 'horizon-sunglasses',
   },
   {
     id: 'pioneer-camera',
@@ -150,7 +144,6 @@ export const CATALOGUE_PRODUCTS: readonly MarketplaceProduct[] = [
     campusHall: 'South Park Halls',
     sellerName: 'Chloe · 3rd Year Arts',
     condition: 'Good',
-    showcaseId: 'pioneer-camera',
   },
   {
     id: 'nordic-desk-lamp',
@@ -167,7 +160,6 @@ export const CATALOGUE_PRODUCTS: readonly MarketplaceProduct[] = [
     campusHall: 'North Hall Block B',
     sellerName: 'Alex · 2nd Year Arch',
     condition: 'Mint',
-    showcaseId: 'nordic-desk-lamp',
   },
   {
     id: 'stagg-kettle',
@@ -179,12 +171,10 @@ export const CATALOGUE_PRODUCTS: readonly MarketplaceProduct[] = [
     reviews: 730,
     inStock: true,
     added: '2026-10-22',
-    image:
-      'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=900&q=80',
+    image: 'https://live.staticflickr.com/65535/52220711420_7496ae6182_b.jpg',
     campusHall: 'Westgate Student Village',
     sellerName: 'Zoe · Final Year Chem',
     condition: 'Like new',
-    showcaseId: 'stagg-kettle',
   },
   {
     id: 'ergo-mesh-chair',
@@ -201,7 +191,6 @@ export const CATALOGUE_PRODUCTS: readonly MarketplaceProduct[] = [
     campusHall: 'Central Campus Union',
     sellerName: 'Marcus · PhD Robotics',
     condition: 'Like new',
-    showcaseId: 'ergo-mesh-chair',
   },
   {
     id: 'hydra-bottle',
@@ -218,7 +207,6 @@ export const CATALOGUE_PRODUCTS: readonly MarketplaceProduct[] = [
     campusHall: 'Sports Complex Hall',
     sellerName: 'Dan · 1st Year Physio',
     condition: 'Mint',
-    showcaseId: 'hydra-bottle',
   },
   {
     id: 'dutch-oven-set',
@@ -230,12 +218,10 @@ export const CATALOGUE_PRODUCTS: readonly MarketplaceProduct[] = [
     reviews: 519,
     inStock: true,
     added: '2026-10-05',
-    image:
-      'https://images.unsplash.com/photo-1584990347449-a2d4c2c044c9?auto=format&fit=crop&w=900&q=80',
+    image: 'https://live.staticflickr.com/3333/3242118749_d34c578389_b.jpg',
     campusHall: 'Oakwood Village',
     sellerName: 'Hannah · 3rd Year Nutrition',
     condition: 'Good',
-    showcaseId: 'dutch-oven-set',
   },
   {
     id: 'field-cap',
@@ -252,27 +238,56 @@ export const CATALOGUE_PRODUCTS: readonly MarketplaceProduct[] = [
     campusHall: 'Founder Courts',
     sellerName: 'Toby · 2nd Year History',
     condition: 'Good',
-    showcaseId: 'field-cap',
   },
 ];
 
+const BASELINE_PRODUCT_MAP = new Map<string, MarketplaceProduct>(
+  CATALOGUE_PRODUCTS.map((item) => [item.id, item]),
+);
+
 export async function fetchMarketplaceProducts(): Promise<MarketplaceProduct[]> {
-  return fetchCollectionWithSeed(
+  const items = await fetchCollectionWithSeed(
     'marketplace_products',
     marketplaceProductSchema,
     marketplaceProductListSchema,
     CATALOGUE_PRODUCTS,
   );
+  // Keep verified catalogue photos for baseline items even if an older remote seed doc exists
+  return items.map((item) => {
+    const baseline = BASELINE_PRODUCT_MAP.get(item.id);
+    if (!baseline) {
+      return item;
+    }
+    const hasUploadedImage = item.image.includes('firebasestorage.googleapis.com');
+    return hasUploadedImage ? item : { ...item, image: baseline.image };
+  });
+}
+
+export async function fetchMarketplaceProductById(id: string): Promise<MarketplaceProduct | null> {
+  const normalizedId = id === 'kestrel-vapor-pace-3' ? 'volt-runners' : id;
+  const items = await fetchMarketplaceProducts();
+  return items.find((item) => item.id === normalizedId) ?? null;
+}
+
+export function buildMessageSellerUrl(
+  product: Pick<MarketplaceProduct, 'name' | 'sellerName' | 'sellerId'>,
+): string {
+  const params = new URLSearchParams({
+    item: product.name,
+    seller: product.sellerName,
+  });
+  if (product.sellerId) {
+    params.set('sellerId', product.sellerId);
+  }
+  return `/messages?${params.toString()}`;
 }
 
 export async function upsertMarketplaceProduct(
   product: MarketplaceProduct,
 ): Promise<MarketplaceProduct> {
-  return upsertCollectionDocument(
-    'marketplace_products',
-    product,
-    marketplaceProductSchema,
-    marketplaceProductListSchema,
-    CATALOGUE_PRODUCTS,
-  );
+  return upsertUserDocument('marketplace_products', product.id, product, marketplaceProductSchema);
+}
+
+export async function removeMarketplaceProduct(productId: string): Promise<void> {
+  return deleteUserDocument('marketplace_products', productId);
 }

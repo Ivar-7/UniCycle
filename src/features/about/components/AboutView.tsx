@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronDown, Leaf, Recycle, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowRight, ChevronDown, Leaf, ShieldCheck, Sparkles, Tag } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { Card, EmptyState, ErrorState, LoadingState } from '@/shared/ui';
@@ -28,18 +28,17 @@ export function AboutView() {
   }
 
   return (
-    <div className="space-y-16 pb-16">
-      {/* Editorial Header */}
-      <section className="rounded-3xl border border-zinc-200 bg-stone-100/80 px-6 py-14 sm:px-12 lg:py-20 dark:border-zinc-800 dark:bg-zinc-900/70">
+    <div className="space-y-14 pb-16 sm:space-y-16">
+      <section className="rounded-3xl border border-zinc-200 bg-stone-100/80 px-6 py-12 sm:px-12 lg:py-18 dark:border-zinc-800 dark:bg-zinc-900/70">
         <div className="mx-auto max-w-3xl space-y-6 text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-zinc-300 bg-white px-3.5 py-1 text-xs font-medium text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
-            <Leaf className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+            <Leaf className="h-3.5 w-3.5 text-zinc-700 dark:text-zinc-300" />
             Our Circular Campus Mission
           </span>
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-5xl dark:text-zinc-100">
             Ending end-of-term landfill waste, one dorm room at a time.
           </h1>
-          <p className="text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
+          <p className="text-sm leading-relaxed text-zinc-600 sm:text-base dark:text-zinc-400">
             Every June, thousands of perfectly good desk lamps, kettles, chairs, and cookware sets
             are discarded when students move out of halls—only for incoming students to buy the
             exact same items brand new in September. UniCycle closes the loop.
@@ -47,22 +46,21 @@ export function AboutView() {
           <div className="flex flex-wrap justify-center gap-3 pt-2">
             <Link
               to="/"
-              className="inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-5 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-zinc-200"
+              className="inline-flex items-center gap-2 rounded-xl border border-zinc-300 bg-zinc-200/80 px-5 py-2.5 text-xs font-semibold text-zinc-900 transition-colors hover:bg-zinc-300/80 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
             >
-              Browse Marketplace
+              Browse Shop
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
-              to="/products"
+              to="/listings"
               className="inline-flex items-center gap-2 rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-xs font-semibold text-zinc-800 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
             >
-              Explore 3D Studio
+              Sell an Item
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Metrics Grid */}
       <section aria-label="Sustainability Impact Metrics" className="grid gap-6 sm:grid-cols-3">
         {data.metrics.map((metric, idx) => (
           <motion.div
@@ -71,7 +69,7 @@ export function AboutView() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.06 }}
           >
-            <Card className="space-y-2">
+            <Card className="h-full space-y-2">
               <p className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">
                 {metric.value}
               </p>
@@ -86,18 +84,17 @@ export function AboutView() {
         ))}
       </section>
 
-      {/* 3 Pillars */}
       <section className="grid gap-6 md:grid-cols-3">
         {[
           {
-            icon: Recycle,
+            icon: Tag,
             title: '1. List in 60 Seconds',
             body: 'Snap a photo, tag your residence hall, and set a student-friendly price before moving out.',
           },
           {
             icon: Sparkles,
             title: '2. Inspect with Clarity',
-            body: 'Buyers filter by category, colour, price, and rating—or inspect flagship gear in our 3D studio.',
+            body: 'Filter by category, colour, price, and rating—and rotate items from every angle before meeting.',
           },
           {
             icon: ShieldCheck,
@@ -122,8 +119,7 @@ export function AboutView() {
         })}
       </section>
 
-      {/* Interactive FAQ Accordion */}
-      <section className="mx-auto max-w-3xl space-y-6">
+      <section className="w-full space-y-6">
         <div className="space-y-1 text-center">
           <span className="text-xs font-medium uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
             FAQ

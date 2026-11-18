@@ -1,5 +1,5 @@
-import { ListingsPlaceholder } from '../components/ListingsPlaceholder';
+import { ListingsView } from '../components/ListingsView';
 
 export default function ListingsPage() {
-  return <ListingsPlaceholder />;
+  return <ListingsView />;
 }

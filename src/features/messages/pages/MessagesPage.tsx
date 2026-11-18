@@ -1,5 +1,5 @@
-import { MessagesPlaceholder } from '../components/MessagesPlaceholder';
+import { MessagesView } from '../components/MessagesView';
 
 export default function MessagesPage() {
-  return <MessagesPlaceholder />;
+  return <MessagesView />;
 }

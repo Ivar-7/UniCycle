@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getUserErrorMessage, logDiagnosticError } from '@/shared/errors';
-import { useAsyncState, type AsyncStatus } from '@/shared/hooks/useAsyncState';
+import { useAsyncState } from '@/shared/hooks/useAsyncState';
+import { useAuth } from '@/shared/hooks/useAuth';
 import { fetchStudentProfile, updateStudentProfile } from '../api/profile.api';
 import type { StudentProfile, UpdateProfileInput } from '../api/profile.types';
 
 export function useProfile() {
+  const { user, isLoading: authLoading } = useAuth();
   const { state, setLoading, setEmpty, setSuccess, setError } =
     useAsyncState<StudentProfile | null>(null, 'loading');
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -12,29 +14,35 @@ export function useProfile() {
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
 
   const loadProfile = useCallback(async () => {
+    if (!user) {
+      setEmpty();
+      return;
+    }
     setLoading();
     try {
-      const profile = await fetchStudentProfile();
+      const profile = await fetchStudentProfile(user);
       setSuccess(profile);
     } catch (err: unknown) {
       setError(err);
     }
-  }, [setError, setLoading, setSuccess]);
+  }, [setEmpty, setError, setLoading, setSuccess, user]);
 
   useEffect(() => {
-    void loadProfile();
-  }, [loadProfile]);
+    if (!authLoading) {
+      void loadProfile();
+    }
+  }, [authLoading, loadProfile]);
 
   const saveProfile = useCallback(
     async (input: UpdateProfileInput, avatarFile?: File | null): Promise<boolean> => {
-      if (!state.data) {
+      if (!state.data || !user) {
         return false;
       }
       setIsSaving(true);
       setSaveError(null);
       setSaveSuccess(false);
       try {
-        const updated = await updateStudentProfile(state.data, input, avatarFile);
+        const updated = await updateStudentProfile(state.data, user.uid, input, avatarFile);
         setSuccess(updated);
         setSaveSuccess(true);
         setIsSaving(false);
@@ -46,25 +54,12 @@ export function useProfile() {
         return false;
       }
     },
-    [setSuccess, state.data],
-  );
-
-  const simulateStatus = useCallback(
-    (status: AsyncStatus) => {
-      if (status === 'loading') {
-        setLoading();
-      } else if (status === 'empty') {
-        setEmpty();
-      } else if (status === 'error') {
-        setError(new Error('Simulated profile fetch error'));
-      } else {
-        void loadProfile();
-      }
-    },
-    [loadProfile, setEmpty, setError, setLoading],
+    [setSuccess, state.data, user],
   );
 
   return {
+    user,
+    authLoading,
     status: state.status,
     profile: state.data,
     error: state.error,
@@ -73,6 +68,5 @@ export function useProfile() {
     saveSuccess,
     saveProfile,
     reload: loadProfile,
-    simulateStatus,
   };
 }

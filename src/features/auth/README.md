@@ -6,5 +6,5 @@ Handles university student authentication, `.ac.uk` / `.edu` campus email valida
 ## Structure
 - `api/` — Types, Zod form validation schema, query keys, and Firebase auth wrapper methods (`auth.api.ts`, `auth.keys.ts`, `auth.schema.ts`, `auth.types.ts`).
 - `state/` — Hook for student login form validation and auth status (`useStudentAuth.ts`).
-- `components/` — Campus authentication placeholder card (`AuthPlaceholder.tsx`).
+- `components/` — Campus authentication view (`AuthView.tsx`).
 - `pages/` — Route composition page (`AuthPage.tsx`).

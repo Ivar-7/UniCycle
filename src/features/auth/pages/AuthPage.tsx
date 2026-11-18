@@ -1,5 +1,5 @@
-import { AuthPlaceholder } from '../components/AuthPlaceholder';
+import { AuthView } from '../components/AuthView';
 
 export default function AuthPage() {
-  return <AuthPlaceholder />;
+  return <AuthView />;
 }

@@ -1,60 +1,86 @@
-import {
-  fetchCollectionWithSeed,
-  removeCollectionDocument,
-  upsertCollectionDocument,
-} from '@/shared/firebase';
+import { logDiagnosticError } from '@/shared/errors';
+import { deleteUserDocument, fetchUserCollection, upsertUserDocument } from '@/shared/firebase';
+import { readJsonStorage, writeJsonStorage } from '@/shared/utils/storage';
 import { wishlistEntryListSchema, wishlistEntrySchema } from './wishlist.schema';
 import type { WishlistEntry } from './wishlist.types';
 
-export const SEED_WISHLIST_ENTRIES: readonly WishlistEntry[] = [
-  {
-    id: 'wish-ergo-chair-01',
-    listingId: 'ergo-mesh-chair',
-    title: 'Aero Ergonomic Mesh Study Chair',
-    price: 145,
-    campusLocation: 'Central Campus Union',
-    inStock: true,
-    savedAt: '2026-11-07T11:00:00.000Z',
-  },
-  {
-    id: 'wish-nordic-lamp-02',
-    listingId: 'nordic-desk-lamp',
-    title: 'Nordic Architect Desk Lamp',
-    price: 48,
-    campusLocation: 'North Hall Block B',
-    inStock: true,
-    savedAt: '2026-11-06T20:10:00.000Z',
-  },
-  {
-    id: 'wish-kestrel-03',
-    listingId: 'kestrel-vapor-pace-3',
-    title: 'Kestrel Vapor Pace 3 (CLOUD · 36)',
-    price: 240,
-    campusLocation: 'Eastgate Courts · Block A',
-    inStock: true,
-    savedAt: '2026-11-08T08:15:00.000Z',
-  },
-];
+const GUEST_WISHLIST_KEY = 'unicycle.guest.wishlist.v1';
 
-export async function fetchWishlistEntries(): Promise<WishlistEntry[]> {
-  return fetchCollectionWithSeed(
-    'wishlists',
-    wishlistEntrySchema,
-    wishlistEntryListSchema,
-    SEED_WISHLIST_ENTRIES,
-  );
+function readGuestWishlist(): WishlistEntry[] {
+  return readJsonStorage(GUEST_WISHLIST_KEY, wishlistEntryListSchema) ?? [];
 }
 
-export async function addWishlistEntry(entry: WishlistEntry): Promise<WishlistEntry> {
-  return upsertCollectionDocument(
-    'wishlists',
-    entry,
-    wishlistEntrySchema,
-    wishlistEntryListSchema,
-    SEED_WISHLIST_ENTRIES,
-  );
+function writeGuestWishlist(entries: readonly WishlistEntry[]): void {
+  writeJsonStorage(GUEST_WISHLIST_KEY, entries);
 }
 
-export async function removeWishlistEntry(id: string): Promise<void> {
-  return removeCollectionDocument('wishlists', id, wishlistEntryListSchema, SEED_WISHLIST_ENTRIES);
+export async function fetchWishlistEntries(userId: string | null): Promise<WishlistEntry[]> {
+  if (!userId) {
+    return readGuestWishlist();
+  }
+
+  // Merge any items saved as guest into the signed-in user's account
+  const guestEntries = readGuestWishlist();
+  if (guestEntries.length > 0) {
+    for (const entry of guestEntries) {
+      const migrated: WishlistEntry = {
+        ...entry,
+        id: `${userId}_${entry.listingId}`,
+        userId,
+      };
+      try {
+        await upsertUserDocument('wishlists', migrated.id, migrated, wishlistEntrySchema);
+      } catch (err: unknown) {
+        logDiagnosticError(err, 'migrateGuestWishlist');
+      }
+    }
+    writeGuestWishlist([]);
+  }
+
+  return fetchUserCollection('wishlists', wishlistEntrySchema, {
+    filterField: 'userId',
+    filterOp: '==',
+    userId,
+    orderByField: 'savedAt',
+  });
+}
+
+export async function addWishlistEntry(
+  entry: Omit<WishlistEntry, 'id' | 'userId'>,
+  userId: string | null,
+): Promise<WishlistEntry> {
+  if (!userId) {
+    const guestItem: WishlistEntry = {
+      ...entry,
+      id: `guest_${entry.listingId}`,
+      userId: 'guest',
+    };
+    const validated = wishlistEntrySchema.parse(guestItem);
+    const current = readGuestWishlist();
+    const next = [validated, ...current.filter((item) => item.listingId !== validated.listingId)];
+    writeGuestWishlist(next);
+    return validated;
+  }
+
+  const docId = `${userId}_${entry.listingId}`;
+  const fullEntry: WishlistEntry = {
+    ...entry,
+    id: docId,
+    userId,
+  };
+  return upsertUserDocument('wishlists', docId, fullEntry, wishlistEntrySchema);
+}
+
+export async function removeWishlistEntry(
+  id: string,
+  listingId: string,
+  userId: string | null,
+): Promise<void> {
+  if (!userId) {
+    const current = readGuestWishlist();
+    writeGuestWishlist(current.filter((item) => item.id !== id && item.listingId !== listingId));
+    return;
+  }
+  const docId = id.startsWith(`${userId}_`) ? id : `${userId}_${listingId}`;
+  await deleteUserDocument('wishlists', docId);
 }

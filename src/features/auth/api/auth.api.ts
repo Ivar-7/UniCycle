@@ -1,13 +1,16 @@
 import {
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
+  type User,
 } from 'firebase/auth';
 import { studentProfileSchema } from '@/features/profile/api/profile.schema';
 import type { StudentProfile } from '@/features/profile/api/profile.types';
 import { logDiagnosticError, normalizeError } from '@/shared/errors';
-import { firebaseAuth, upsertSingleDocument } from '@/shared/firebase';
+import { firebaseAuth, upsertUserDocument } from '@/shared/firebase';
+import { isCampusEmail, resolveDisplayName } from '@/shared/utils/user';
 import {
   authSessionSummarySchema,
   studentRegisterSchema,
@@ -19,57 +22,17 @@ import type {
   StudentSignInCredentials,
 } from './auth.types';
 
-const SESSION_STORAGE_KEY = 'unicycle.auth.session.v1';
-
-export const SEED_AUTH_SESSION: AuthSessionSummary = {
-  uid: 'stu-001',
-  email: 'a.rivera@university.ac.uk',
-  fullName: 'Alex Rivera',
-  residenceHall: 'North Hall Residence, Block B',
-  verifiedCampusDomain: true,
-  authProvider: 'campus-seed',
-};
-
-function persistLocalSession(session: AuthSessionSummary | null): void {
-  try {
-    if (!session) {
-      window.localStorage.removeItem(SESSION_STORAGE_KEY);
-      return;
-    }
-    window.localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
-  } catch (err: unknown) {
-    logDiagnosticError(err, 'auth.api.persistLocalSession');
+export function buildSessionSummary(user: User): AuthSessionSummary | null {
+  if (!user.email) {
+    return null;
   }
-}
-
-export function getInitialAuthSession(): AuthSessionSummary {
-  const currentUser = firebaseAuth.currentUser;
-  if (currentUser && currentUser.email) {
-    return {
-      uid: currentUser.uid,
-      email: currentUser.email,
-      fullName: currentUser.displayName ?? 'Verified Student',
-      residenceHall: 'North Hall Residence, Block B',
-      verifiedCampusDomain:
-        currentUser.email.endsWith('.ac.uk') || currentUser.email.endsWith('.edu'),
-      authProvider: 'firebase',
-    };
-  }
-
-  try {
-    const raw = window.localStorage.getItem(SESSION_STORAGE_KEY);
-    if (raw) {
-      const parsed: unknown = JSON.parse(raw);
-      const result = authSessionSummarySchema.safeParse(parsed);
-      if (result.success) {
-        return result.data;
-      }
-    }
-  } catch (err: unknown) {
-    logDiagnosticError(err, 'auth.api.getInitialAuthSession');
-  }
-
-  return SEED_AUTH_SESSION;
+  const email = user.email.toLowerCase();
+  return {
+    uid: user.uid,
+    email,
+    fullName: resolveDisplayName({ displayName: user.displayName, email }, 'Verified Student'),
+    verifiedCampusDomain: isCampusEmail(email),
+  };
 }
 
 export async function signInStudentWithFirebase(
@@ -83,41 +46,14 @@ export async function signInStudentWithFirebase(
       validated.universityEmail,
       validated.password,
     );
-    const user = userCredential.user;
-    const session: AuthSessionSummary = {
-      uid: user.uid,
-      email: user.email ?? validated.universityEmail,
-      fullName: user.displayName ?? 'Alex Rivera',
-      residenceHall: 'North Hall Residence, Block B',
-      verifiedCampusDomain: true,
-      authProvider: 'firebase',
-    };
-    persistLocalSession(session);
-    return authSessionSummarySchema.parse(session);
+    const summary = buildSessionSummary(userCredential.user);
+    if (!summary) {
+      throw new Error('Account email missing from authenticated session');
+    }
+    return authSessionSummarySchema.parse(summary);
   } catch (err: unknown) {
     logDiagnosticError(err, 'auth.api.signInStudentWithFirebase');
-
-    // If signing in with the seeded campus account or if Firebase Auth email/password provider
-    // has not yet been enabled in the Firebase console, provide seamless verified campus session
-    const normalized = normalizeError(err, 'AUTH_INVALID_CREDENTIALS');
-    if (
-      validated.universityEmail.toLowerCase() === SEED_AUTH_SESSION.email.toLowerCase() ||
-      normalized.code === 'AUTH_UNAUTHORIZED' ||
-      normalized.code === 'UNKNOWN_ERROR'
-    ) {
-      const fallbackSession: AuthSessionSummary = {
-        uid: SEED_AUTH_SESSION.uid,
-        email: validated.universityEmail,
-        fullName: 'Alex Rivera',
-        residenceHall: 'North Hall Residence, Block B',
-        verifiedCampusDomain: true,
-        authProvider: 'campus-seed',
-      };
-      persistLocalSession(fallbackSession);
-      return authSessionSummarySchema.parse(fallbackSession);
-    }
-
-    throw normalized;
+    throw normalizeError(err, 'AUTH_INVALID_CREDENTIALS');
   }
 }
 
@@ -139,58 +75,39 @@ export async function registerStudentWithFirebase(
       id: user.uid,
       fullName: validated.fullName,
       universityEmail: validated.universityEmail,
-      universityName: 'Central Tech University',
+      universityName: 'Verified Campus Member',
       residenceHall: validated.residenceHall,
       isVerifiedStudent: true,
-      itemsReusedCount: 1,
-      wasteDivertedKg: 2.5,
+      itemsReusedCount: 0,
+      wasteDivertedKg: 0,
       rating: 5.0,
     };
 
-    await upsertSingleDocument('users', user.uid, newProfile, studentProfileSchema);
+    await upsertUserDocument('users', user.uid, newProfile, studentProfileSchema);
 
-    const session: AuthSessionSummary = {
+    return authSessionSummarySchema.parse({
       uid: user.uid,
       email: validated.universityEmail,
       fullName: validated.fullName,
-      residenceHall: validated.residenceHall,
       verifiedCampusDomain: true,
-      authProvider: 'firebase',
-    };
-    persistLocalSession(session);
-    return authSessionSummarySchema.parse(session);
+    });
   } catch (err: unknown) {
     logDiagnosticError(err, 'auth.api.registerStudentWithFirebase');
+    throw normalizeError(err, 'AUTH_INVALID_CREDENTIALS');
+  }
+}
 
-    const fallbackId = `stu-${Date.now()}`;
-    const fallbackProfile: StudentProfile = {
-      id: fallbackId,
-      fullName: validated.fullName,
-      universityEmail: validated.universityEmail,
-      universityName: 'Central Tech University',
-      residenceHall: validated.residenceHall,
-      isVerifiedStudent: true,
-      itemsReusedCount: 1,
-      wasteDivertedKg: 2.5,
-      rating: 5.0,
-    };
-    await upsertSingleDocument('users', fallbackId, fallbackProfile, studentProfileSchema);
-
-    const fallbackSession: AuthSessionSummary = {
-      uid: fallbackId,
-      email: validated.universityEmail,
-      fullName: validated.fullName,
-      residenceHall: validated.residenceHall,
-      verifiedCampusDomain: true,
-      authProvider: 'campus-seed',
-    };
-    persistLocalSession(fallbackSession);
-    return authSessionSummarySchema.parse(fallbackSession);
+export async function sendStudentPasswordReset(email: string): Promise<void> {
+  const validEmail = studentSignInSchema.shape.universityEmail.parse(email);
+  try {
+    await sendPasswordResetEmail(firebaseAuth, validEmail);
+  } catch (err: unknown) {
+    logDiagnosticError(err, 'auth.api.sendStudentPasswordReset');
+    throw normalizeError(err, 'AUTH_INVALID_CREDENTIALS');
   }
 }
 
 export async function signOutStudentFromFirebase(): Promise<void> {
-  persistLocalSession(null);
   try {
     if (firebaseAuth.currentUser) {
       await signOut(firebaseAuth);
